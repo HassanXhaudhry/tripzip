@@ -13,9 +13,8 @@ type RootStackParamList = {
     Home: undefined;
     Signup: undefined;
     // Add other routes here
-  };
-  
-// Create an animated version of FlatList
+};
+
 const AnimatedFlatList = Animated.createAnimatedComponent(FlatList) as React.ForwardRefExoticComponent<
     FlatListProps<FlightItem> & React.RefAttributes<FlatList<FlightItem>>
 >;
@@ -28,6 +27,8 @@ const Home: React.FC = () => {
     const [activeIndex, setActiveIndex] = useState<number>(0);
     const [items, setItems] = useState<FlightItem[]>([]);
     const scrollX = useRef(new Animated.Value(0)).current;
+    const buttonTextOpacity = useRef(new Animated.Value(1)).current;
+    const [buttonText, setButtonText] = useState("Next");
 
     const slideClicked = (item: FlightItem): void => {
         console.log(`Slide ${item.id} clicked`);
@@ -37,6 +38,32 @@ const Home: React.FC = () => {
         const newIndex = Math.round(event.nativeEvent.contentOffset.x / screenWidth);
         if (newIndex !== activeIndex && newIndex >= 0 && newIndex < items.length) {
             setActiveIndex(newIndex);
+            // Smooth transition for button text when index changes
+            updateButtonTextWithAnimation(newIndex);
+        }
+    };
+
+    const updateButtonTextWithAnimation = (index: number) => {
+        const newText = index >= 2 ? "Get Started" : "Next";
+        
+        // Only animate if text is actually changing
+        if (newText !== buttonText) {
+            // Fade out current text
+            Animated.timing(buttonTextOpacity, {
+                toValue: 0,
+                duration: 65,
+                useNativeDriver: true
+            }).start(() => {
+                // Change text while invisible
+                setButtonText(newText);
+                
+                // Fade in new text
+                Animated.timing(buttonTextOpacity, {
+                    toValue: 1,
+                    duration: 65,
+                    useNativeDriver: true
+                }).start();
+            });
         }
     };
 
@@ -74,36 +101,31 @@ const Home: React.FC = () => {
         ));
     };
 
-    // Modified to render each word with custom styling
     const renderStyledText = (text: string, secondText?: string, itemId?: number) => {
         const words = text.split(' ');
-        
+
         return (
             <View style={{ flexDirection: 'column', alignItems: 'center' }}>
-                {/* First text */}
                 <View style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center' }}>
                     {words.map((word, index) => {
-                        let wordColor = '#000000'; // Default black
+                        let wordColor = '#000000';
                         let fontStyle: 'normal' | 'italic' = 'normal';
-    
-                        // Remove punctuation for clean comparison
                         const cleanWord = word.replace(/[^\w]/g, '');
-                        console.log('Clean word:', cleanWord); // Debug log
                         if (itemId === 0 && cleanWord.toLowerCase() === 'tripzip') {
                             wordColor = '#FFFFFF';
                             fontStyle = 'italic';
                         }
-                        
+
                         const wordStyles = {
                             fontSize: 26,
                             color: wordColor,
                             fontStyle: fontStyle,
-                            fontFamily: 'PlusJakartaSans-Bold', // Apply Plus Jakarta Sans font
+                            fontFamily: 'PlusJakartaSans-Bold',
                             marginHorizontal: 3,
                             marginVertical: 2,
                             fontWeight: 'bold'
                         };
-    
+
                         return (
                             <Text key={`word-${index}`} style={wordStyles}>
                                 {word}
@@ -112,27 +134,26 @@ const Home: React.FC = () => {
                         );
                     })}
                 </View>
-    
-                {/* Second text */}
+
                 {secondText && (
                     <View style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', marginTop: 8 }}>
                         {secondText.split(' ').map((word, index) => {
-let wordColor = '#000000'; // Default color
+                            let wordColor = '#000000';
 
-if (itemId === 0 || itemId === 1) {
-    wordColor = '#FFFFFF';
-} else if (itemId === 2) {
-    wordColor = '#858585';
-}
-    
+                            if (itemId === 0 || itemId === 1) {
+                                wordColor = '#FFFFFF';
+                            } else if (itemId === 2) {
+                                wordColor = '#858585';
+                            }
+
                             const secondWordStyles = {
                                 fontSize: 18,
                                 color: wordColor,
-                                fontFamily: 'PlusJakartaSans', // Apply Plus Jakarta Sans font
+                                fontFamily: 'PlusJakartaSans',
                                 marginHorizontal: 3,
                                 marginVertical: 2,
                             };
-    
+
                             return (
                                 <Text key={`word2-${index}`} style={secondWordStyles}>
                                     {word}
@@ -145,16 +166,13 @@ if (itemId === 0 || itemId === 1) {
             </View>
         );
     };
-    
-    
-    
 
-    // Navigation button for scrolling to next
+
     const scrollToNext = () => {
         if (activeIndex < items.length - 1) {
             const nextIndex = activeIndex + 1;
-            // Explicitly set activeIndex here too
             setActiveIndex(nextIndex);
+            updateButtonTextWithAnimation(nextIndex);
 
             if (flatlistRef.current) {
                 flatlistRef.current.scrollToIndex({
@@ -167,13 +185,11 @@ if (itemId === 0 || itemId === 1) {
         }
     };
 
-    // Skip button handler to navigate directly to login
     const handleSkip = () => {
         navigation.navigate('Signup');
     };
 
     React.useEffect(() => {
-        // Fixed image loading by ensuring correct path is used
         try {
             const DATA: FlightItem[] = [
                 { id: 0, image: require('../assets/images/car1.png'), text: 'The best car in your hands with TripZip', secondText: 'Discover the convenience of finding your perfect ride with our TripZip App' },
@@ -183,7 +199,6 @@ if (itemId === 0 || itemId === 1) {
             setItems(DATA);
         } catch (error) {
             console.error("Error loading images:", error);
-            // Fallback if images can't be loaded
             const DATA: FlightItem[] = [
                 { id: 0, image: null, text: 'The best car in your hands with TripZip', secondText: 'Discover the convenience of finding your perfect ride with our TripZip App' },
                 { id: 1, image: null, text: 'The perfect ride is just a tap away!', secondText: 'Your journey begins with TripZip. Find your ideal ride effortlessly.' },
@@ -193,19 +208,12 @@ if (itemId === 0 || itemId === 1) {
         }
     }, []);
 
-    // Determine button text based on activeIndex
-    const getButtonText = () => {
-        return activeIndex >= 2 ? "Get Started" : "Next";
-    };
-
-    // Determine button style based on activeIndex
     const getButtonStyle = () => {
         return activeIndex >= 2 ? styles.getStartedButton : styles.nextButton;
     };
 
     return (
         <View style={styles.container}>
-            {/* Skip button at the top right */}
             <View style={styles.skipButtonContainer}>
                 <TouchableOpacity
                     onPress={handleSkip}
@@ -241,7 +249,6 @@ if (itemId === 0 || itemId === 1) {
                     scrollEventThrottle={16}
                 />
 
-                {/* Styled text where each word has custom styling */}
                 <View style={styles.textContainer}>
                     {items.length > 0 && activeIndex < items.length && (
                         renderStyledText(
@@ -253,20 +260,25 @@ if (itemId === 0 || itemId === 1) {
                 </View>
             </View>
 
-            {/* Bar indicators below the text with consistent spacing */}
             <View style={styles.indicatorContainer}>
                 {renderBarIndicators()}
             </View>
 
-            {/* Bottom button with dynamic text */}
             <View style={styles.buttonContainer}>
                 <TouchableOpacity
                     onPress={scrollToNext}
                     style={[styles.button, getButtonStyle()]}
-                    accessibilityLabel={getButtonText()}
+                    accessibilityLabel={buttonText}
                     accessibilityRole="button"
                 >
-                    <Text style={styles.buttonText}>{getButtonText()}</Text>
+                    <Animated.Text 
+                        style={[
+                            styles.buttonText,
+                            { opacity: buttonTextOpacity }
+                        ]}
+                    >
+                        {buttonText}
+                    </Animated.Text>
                 </TouchableOpacity>
             </View>
         </View>
@@ -297,31 +309,33 @@ const styles = StyleSheet.create({
     contentContainer: {
         flex: 1,
         justifyContent: 'center',
-        marginTop: 60, // Add space for the skip button
+        marginTop: 60,
     },
     indicatorContainer: {
         flexDirection: "row",
         justifyContent: "center",
         alignItems: 'center',
-        marginVertical: 20, // Consistent spacing
+        marginVertical: 20,
     },
     textContainer: {
         alignItems: 'center',
         justifyContent: 'center',
-        marginTop: 20, // Consistent spacing
+        marginTop: 20,
         paddingHorizontal: 20
     },
     buttonContainer: {
         width: '100%',
         alignItems: 'center',
         paddingBottom: 40,
-        marginTop: 20, // Consistent spacing
+        marginTop: 20,
     },
     button: {
         padding: 12,
         borderRadius: 30,
         width: '90%',
-        alignItems: 'center'
+        alignItems: 'center',
+        justifyContent: 'center',
+        minWidth: 200, // Ensure button width remains consistent
     },
     nextButton: {
         backgroundColor: 'black',
@@ -332,7 +346,8 @@ const styles = StyleSheet.create({
     buttonText: {
         color: 'white',
         fontSize: 16,
-        fontWeight: 'bold'
+        fontWeight: 'bold',
+        textAlign: 'center',
     }
 });
 

@@ -46,7 +46,7 @@ const Home: React.FC = () => {
 
     const updateButtonTextWithAnimation = (index: number) => {
         const newText = index >= 2 ? "Get Started" : "Next";
-        
+
         // Only animate if text is actually changing
         if (newText !== buttonText) {
             // Fade out current text
@@ -57,7 +57,7 @@ const Home: React.FC = () => {
             }).start(() => {
                 // Change text while invisible
                 setButtonText(newText);
-                
+
                 // Fade in new text
                 Animated.timing(buttonTextOpacity, {
                     toValue: 1,
@@ -118,17 +118,23 @@ const Home: React.FC = () => {
                         }
 
                         const wordStyles = {
-                            fontSize: 26,
-                            color: wordColor,
-                            fontStyle: fontStyle,
-                            fontFamily: 'PlusJakartaSans-Bold',
-                            marginHorizontal: 3,
-                            marginVertical: 2,
-                            //fontWeight: 'bold'
                         };
 
                         return (
-                            <Text key={`word-${index}`} style={wordStyles}>
+                            <Text
+                                key={`word-${index}`}
+                                style={[
+                                    wordStyles, 
+                                    {
+                                        fontSize: 26,
+                                        color: wordColor,
+                                        fontStyle: fontStyle,
+                                        marginHorizontal: 3,
+                                        marginVertical: 2,
+                                        fontWeight: 'bold',
+                                    }
+                                ]}
+                            >
                                 {word}
                                 {index < words.length - 1 ? ' ' : ''}
                             </Text>
@@ -216,7 +222,6 @@ const Home: React.FC = () => {
             <View style={styles.skipButtonContainer}>
                 <TouchableOpacity
                     onPress={handleSkip}
-                    style={styles.skipButton}
                     accessibilityLabel="Skip onboarding"
                     accessibilityRole="button"
                 >
@@ -270,7 +275,7 @@ const Home: React.FC = () => {
                     accessibilityLabel={buttonText}
                     accessibilityRole="button"
                 >
-                    <Animated.Text 
+                    <Animated.Text
                         style={[
                             styles.buttonText,
                             { opacity: buttonTextOpacity }
@@ -290,15 +295,14 @@ const styles = StyleSheet.create({
         height: '100%',
         flexDirection: 'column',
         justifyContent: 'space-between',
-        backgroundColor: '#FFB300'
+        backgroundColor: '#FFB300',
+        fontFamily: 'PlusJakartaSans-Bold',
     },
     skipButtonContainer: {
         position: 'absolute',
-        top: 20,
-        right: 20,
+        top: 50,
+        right: 50,
         zIndex: 10,
-    },
-    skipButton: {
     },
     skipButtonText: {
         color: 'black',

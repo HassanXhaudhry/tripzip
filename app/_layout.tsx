@@ -6,8 +6,8 @@ import { Stack } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import { View, Image, StyleSheet } from 'react-native';
 
+
 export default function RootLayout() {
-  // Always call hooks at the top
   useFrameworkReady();
 
   const [isSplashVisible, setIsSplashVisible] = useState(true);
@@ -19,7 +19,6 @@ export default function RootLayout() {
     return () => clearTimeout(timer);
   }, []);
 
-  // Conditionally render the splash screen
   if (isSplashVisible) {
     return (
       <View style={styles.splashContainer}>
@@ -30,7 +29,6 @@ export default function RootLayout() {
       </View>
     );
   }
-
 
   return (
     <Provider store={store}>

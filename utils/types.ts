@@ -1,11 +1,14 @@
-import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
-// Define your stack's routes
-export type RootStackParamList = {
-  Splash: undefined;
-  Home: undefined;
-  Signup: undefined;
-};
+declare module 'react-native-vector-icons/Feather' {
+  import { FC } from 'react';
+  import { TextProps } from 'react-native';
 
-// Define a type for your navigation prop
-export type SplashScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Splash'>;
+  export interface IconProps extends TextProps {
+    name: string;
+    size?: number;
+    color?: string;
+  }
+
+  const Icon: FC<IconProps>;
+  export default Icon;
+}

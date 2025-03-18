@@ -15,13 +15,13 @@ type RootStackParamList = {
     Signup: undefined;
     // Add other routes here
 };
-const router = useRouter();
 const AnimatedFlatList = Animated.createAnimatedComponent(FlatList) as React.ForwardRefExoticComponent<
     FlatListProps<FlightItem> & React.RefAttributes<FlatList<FlightItem>>
 >;
 type HomeScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Home'>;
 const Home: React.FC = () => {
     const navigation = useNavigation<HomeScreenNavigationProp>();
+    const router = useRouter();
     const flatlistRef = useRef<FlatList<FlightItem>>(null);
     const screenWidth = Dimensions.get("window").width;
     const screenHeight = Dimensions.get("window").height;
@@ -243,7 +243,7 @@ const Home: React.FC = () => {
                         { useNativeDriver: true, listener: handleScroll }
                     )}
                     onScrollToIndexFailed={(info) => {
-                        const wait = new Promise(resolve => setTimeout(resolve, 500));
+                        const wait = new Promise(resolve => setTimeout(resolve, 3000));
                         wait.then(() => {
                             if (flatlistRef.current) {
                                 flatlistRef.current.scrollToIndex({ index: info.index, animated: true });

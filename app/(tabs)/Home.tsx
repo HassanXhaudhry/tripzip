@@ -1,10 +1,198 @@
-import { Text, View } from 'react-native'
-import React, { Component } from 'react'
+import { View, Text, StyleSheet, TextInput, TouchableOpacity, Platform, ScrollView } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+//import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
+import { MaterialIcons } from '@expo/vector-icons';
+import { logout } from '../../store/slices/authSlice'
+import { useState, useEffect } from 'react';
+import * as Location from 'expo-location';
+import Feather from '@expo/vector-icons/Feather';
+import { useDispatch } from 'react-redux';
+import { AppDispatch } from '../../store/store';
+import { useRouter } from 'expo-router';
 
-export default function Home()  {
+export default function Home() {
+    const dispatch = useDispatch<AppDispatch>();
+    const router = useRouter();
+  
+    const handleLogout = async () => {
+      await dispatch(logout());
+      router.replace('../Login');
+    };
+
+    // const [location, setLocation] = useState<Location.LocationObject | null>(null);
+    // const [cars] = useState(
+    //       [
+    //       { id: 1, latitude: 37.78925, longitude: -122.4324 },
+    //       { id: 2, latitude: 37.78825, longitude: -122.4314 },
+    //       { id: 3, latitude: 37.78725, longitude: -122.4334 },
+    //       { id: 4, latitude: 37.78625, longitude: -122.4344 },
+    //       { id: 5, latitude: 37.78525, longitude: -122.4354 },
+    //       { id: 6, latitude: 37.78425, longitude: -122.4364 },
+    //       { id: 7, latitude: 37.78325, longitude: -122.4374 },
+    //     ]
+    // );
+
+    // useEffect(() => {
+    //     (async () => {
+    //         const { status } = await Location.requestForegroundPermissionsAsync();
+    //         if (status !== 'granted') {
+    //             return;
+    //         }
+
+    //         const currentLocation = await Location.getCurrentPositionAsync({});
+    //         setLocation(currentLocation);
+    //     })();
+    // }, []);
+
     return (
-      <View>
-        <Text>Home</Text>
-      </View>
-    )
+        <SafeAreaView style={styles.container}>
+            <ScrollView contentContainerStyle={styles.scrollContent}>
+                <View style={styles.header}>
+                    <Text style={styles.welcomeText}>Welcome John</Text>
+                    <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
+                        <MaterialIcons name="logout" size={24} color="black" />
+                    </TouchableOpacity>
+                </View>
+                <View style={styles.searchContainer}>
+                    <Feather name="search" size={18} />
+                    <TextInput
+                        style={styles.searchInput}
+                        placeholder="Where do you want to go?"
+                        placeholderTextColor="#666"
+                    />
+                </View>
+
+                <Text style={styles.locationText}>Your current location</Text>
+
+                {/* <View style={styles.mapContainer}>
+                    <MapView
+                        provider={Platform.OS === 'android' ? PROVIDER_GOOGLE : undefined}
+                        style={styles.map}
+                        initialRegion={{
+                            latitude: location?.coords.latitude || 37.78825,
+                            longitude: location?.coords.longitude || -122.4324,
+                            latitudeDelta: 0.0922,
+                            longitudeDelta: 0.0421,
+                        }}
+                    >
+                        {location && (
+                            <Marker
+                                coordinate={{
+                                    latitude: location.coords.latitude,
+                                    longitude: location.coords.longitude,
+                                }}
+                                pinColor="#4A90E2"
+                            />
+                        )}
+                        {cars.map((car) => (
+              <Marker
+                key={car.id}
+                coordinate={{
+                  latitude: car.latitude,
+                  longitude: car.longitude,
+                }}
+                pinColor="#000"
+              />
+            ))}
+                    </MapView>
+                </View> */}
+
+                <TouchableOpacity style={styles.bookButton}>
+                    <Text style={styles.bookButtonText}>Book Your Ride →</Text>
+                </TouchableOpacity>
+
+                <View style={styles.bottomNav}>
+                    <Feather name="home" size={24} color="white" />
+                    <Feather name="file-text" size={24} color="white" />
+                    <Feather name="user" size={24} color="white" />
+                </View>
+            </ScrollView>
+        </SafeAreaView>
+    );
 }
+
+const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+        backgroundColor: '#FFB300',
+        fontFamily: 'PlusJakartaSans-Bold',
+    },
+    scrollContent: {
+        flexGrow: 1,
+        paddingBottom: 20,
+    },
+    header: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        paddingHorizontal: 20,
+        paddingTop: 10,
+    },
+    welcomeText: {
+        fontSize: 24,
+        fontWeight: 'bold',
+        color: '#000',
+    },
+    logoutButton: {
+        padding: 8,
+    },
+    searchContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        backgroundColor: '#FFF',
+        margin: 20,
+        borderRadius: 25,
+        paddingHorizontal: 15,
+        height: 50
+    },
+    searchIcon: {
+        marginRight: 10,
+    },
+    searchInput: {
+        flex: 1,
+        fontSize: 16,
+        color: '#000',
+    },
+    locationText: {
+        fontSize: 18,
+        fontWeight: '600',
+        color: '#000',
+        marginLeft: 20,
+        marginBottom: 10,
+    },
+    mapContainer: {
+        height: 300, // Fixed height for the map
+        marginHorizontal: 20,
+        borderRadius: 20,
+        overflow: 'hidden',
+        marginBottom: 20,
+    },
+    map: {
+        flex: 1,
+    },
+    bookButton: {
+        backgroundColor: '#000',
+        marginHorizontal: 20,
+        marginBottom: 40,
+        height: 56,
+        borderRadius: 28,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    bookButtonText: {
+        color: '#FFF',
+        fontSize: 18,
+        fontWeight: '600',
+    },
+    bottomNav: {
+        flexDirection: 'row',
+        justifyContent: 'space-around',
+        padding: 4,
+        backgroundColor: '#333333',
+        marginHorizontal: 20,
+        marginTop: 40,
+        height: 80,
+        borderRadius: 40,
+        alignItems: 'center',
+    }
+});

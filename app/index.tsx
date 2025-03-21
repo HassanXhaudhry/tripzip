@@ -20,6 +20,7 @@ const AnimatedFlatList = Animated.createAnimatedComponent(FlatList) as React.For
 >;
 type HomeScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Home'>;
 const Home: React.FC = () => {
+    
     const navigation = useNavigation<HomeScreenNavigationProp>();
     const router = useRouter();
     const flatlistRef = useRef<FlatList<FlightItem>>(null);
@@ -30,6 +31,9 @@ const Home: React.FC = () => {
     const scrollX = useRef(new Animated.Value(0)).current;
     const buttonTextOpacity = useRef(new Animated.Value(1)).current;
     const [buttonText, setButtonText] = useState("Next");
+    
+    const mainTextOpacity = useRef(new Animated.Value(1)).current;
+    const secondTextOpacity = useRef(new Animated.Value(1)).current;
 
     const slideClicked = (item: FlightItem): void => {
         console.log(`Slide ${item.id} clicked`);
@@ -38,34 +42,49 @@ const Home: React.FC = () => {
     const handleScroll = (event: NativeSyntheticEvent<NativeScrollEvent>): void => {
         const newIndex = Math.round(event.nativeEvent.contentOffset.x / screenWidth);
         if (newIndex !== activeIndex && newIndex >= 0 && newIndex < items.length) {
-            setActiveIndex(newIndex);
-            // Smooth transition for button text when index changes
-            updateButtonTextWithAnimation(newIndex);
+            updateIndexWithAnimations(newIndex);
         }
     };
 
-    const updateButtonTextWithAnimation = (index: number) => {
-        const newText = index >= 2 ? "Get Started" : "Next";
-
-        // Only animate if text is actually changing
-        if (newText !== buttonText) {
-            // Fade out current text
+    const updateIndexWithAnimations = (newIndex: number) => {
+        Animated.parallel([
             Animated.timing(buttonTextOpacity, {
                 toValue: 0,
-                duration: 65,
+                duration: 150,
                 useNativeDriver: true
-            }).start(() => {
-                // Change text while invisible
-                setButtonText(newText);
-
-                // Fade in new text
+            }),
+            Animated.timing(mainTextOpacity, {
+                toValue: 0,
+                duration: 150,
+                useNativeDriver: true
+            }),
+            Animated.timing(secondTextOpacity, {
+                toValue: 0,
+                duration: 150,
+                useNativeDriver: true
+            })
+        ]).start(() => {
+            setActiveIndex(newIndex);
+            setButtonText(newIndex >= 2 ? "Get Started" : "Next");
+  
+            Animated.parallel([
                 Animated.timing(buttonTextOpacity, {
                     toValue: 1,
-                    duration: 65,
+                    duration: 150,
                     useNativeDriver: true
-                }).start();
-            });
-        }
+                }),
+                Animated.timing(mainTextOpacity, {
+                    toValue: 1,
+                    duration: 150,
+                    useNativeDriver: true
+                }),
+                Animated.timing(secondTextOpacity, {
+                    toValue: 1,
+                    duration: 150,
+                    useNativeDriver: true
+                })
+            ]).start();
+        });
     };
 
     const renderItem: ListRenderItem<FlightItem> = ({ item, index }) => {
@@ -107,7 +126,7 @@ const Home: React.FC = () => {
 
         return (
             <View style={{ flexDirection: 'column', alignItems: 'center' }}>
-                <View style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center' }}>
+                <Animated.View style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', opacity: mainTextOpacity }}>
                     {words.map((word, index) => {
                         let wordColor = '#000000';
                         let fontStyle: 'normal' | 'italic' = 'normal';
@@ -140,10 +159,10 @@ const Home: React.FC = () => {
                             </Text>
                         );
                     })}
-                </View>
+                </Animated.View>
 
                 {secondText && (
-                    <View style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', marginTop: 8 }}>
+                    <Animated.View style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', marginTop: 8, opacity: secondTextOpacity }}>
                         {secondText.split(' ').map((word, index) => {
                             let wordColor = '#000000';
 
@@ -168,16 +187,17 @@ const Home: React.FC = () => {
                                 </Text>
                             );
                         })}
-                    </View>
+                    </Animated.View>
                 )}
             </View>
         );
     };
+    
     const scrollToNext = () => {
         if (activeIndex < items.length - 1) {
             const nextIndex = activeIndex + 1;
-            setActiveIndex(nextIndex);
-            updateButtonTextWithAnimation(nextIndex);
+            
+            updateIndexWithAnimations(nextIndex);
 
             if (flatlistRef.current) {
                 flatlistRef.current.scrollToIndex({
@@ -338,7 +358,7 @@ const styles = StyleSheet.create({
         width: '90%',
         alignItems: 'center',
         justifyContent: 'center',
-        minWidth: 200, // Ensure button width remains consistent
+        minWidth: 200,
     },
     nextButton: {
         backgroundColor: 'black',

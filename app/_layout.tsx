@@ -1,42 +1,54 @@
-import { StatusBar } from 'expo-status-bar';
-import { Provider } from 'react-redux';
-import { store } from '../store/store';
-import { useFrameworkReady } from '@/hooks/useFrameworkReady';
-import { Stack } from 'expo-router';
-import React, { useEffect, useState } from 'react';
-import { View, Image, StyleSheet } from 'react-native';
+import { StatusBar } from "expo-status-bar";
+import { useFrameworkReady } from "@/hooks/useFrameworkReady";
+import { Stack } from "expo-router";
+import React, { useEffect, useState } from "react";
+import { View, Image, StyleSheet } from "react-native";
+import { useSelector, useDispatch, Provider } from "react-redux";
+import { RootState, store, AppDispatch } from "../store/store";
+import { loadToken } from "../store/slices/authSlice";
 
-
-export default function RootLayout() {
+function AuthLayout() {
   useFrameworkReady();
+  const dispatch = useDispatch<AppDispatch>();
+  const { isAuthenticated } = useSelector((state: RootState) => state.auth);
+
+  useEffect(() => {
+    dispatch(loadToken());
+  }, [dispatch]);
 
   const [isSplashVisible, setIsSplashVisible] = useState(true);
 
   useEffect(() => {
     const timer = setTimeout(() => {
       setIsSplashVisible(false);
-    }, 5000);
+    }, 3000);
     return () => clearTimeout(timer);
   }, []);
 
   if (isSplashVisible) {
     return (
       <View style={styles.splashContainer}>
-        <Image 
-          source={require('../assets/images/splash.png')} 
-          style={styles.splashImage} 
-        />
+        <Image source={require("../assets/images/splash.png")} style={styles.splashImage} />
       </View>
     );
   }
 
   return (
+    <Stack screenOptions={{ headerShown: false }}>
+      {isAuthenticated ? (
+        <Stack.Screen name="Home" />
+      ) : (
+        <Stack.Screen name="Login" />
+      )}
+      <Stack.Screen name="Signup" />
+    </Stack>
+  );
+}
+
+export default function RootLayout() {
+  return (
     <Provider store={store}>
-      <Stack screenOptions={{ headerShown: false }}>
-        <Stack.Screen name="(tabs)" />
-        <Stack.Screen name="+not-found" />
-      </Stack>
-      <StatusBar style="auto" />
+      <AuthLayout />
     </Provider>
   );
 }
@@ -44,13 +56,13 @@ export default function RootLayout() {
 const styles = StyleSheet.create({
   splashContainer: {
     flex: 1,
-    backgroundColor: '#ffffff',
-    alignItems: 'center',
-    justifyContent: 'center',
+    backgroundColor: "#ffffff",
+    alignItems: "center",
+    justifyContent: "center",
   },
   splashImage: {
-    width: '100%',
-    height: '100%',
-    resizeMode: 'cover',
+    width: "100%",
+    height: "100%",
+    resizeMode: "cover",
   },
 });

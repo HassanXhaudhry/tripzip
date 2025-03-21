@@ -1,190 +1,179 @@
-import React, { useState } from 'react';
-import { ScrollView, View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { Image } from 'react-native';
+import { ScrollView, View, Text, StyleSheet, TouchableOpacity, TextInput, KeyboardAvoidingView, Platform } from 'react-native';
 import { useForm, Controller } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
-import { TextInput } from 'react-native';
-import { useDispatch } from 'react-redux';
-import { setCredentials, setError, setLoading } from '../../store/slices/authSlice';
-import { Link } from 'expo-router';
+import { useDispatch, useSelector } from 'react-redux';
+import { Link, useRouter } from 'expo-router';
 import Feather from '@expo/vector-icons/Feather';
+import { signup } from '@/store/slices/authSlice';
+import { AppDispatch, RootState } from '../../store/store';
 
 const schema = yup.object().shape({
   name: yup.string().required('Name is required'),
   phone: yup.string().required('Phone number is required'),
   email: yup.string().email('Invalid email').required('Email is required'),
-  password: yup
-    .string()
-    .min(8, 'Password must be at least 8 characters')
-    .required('Password is required'),
+  password: yup.string().min(8, 'Password must be at least 8 characters').required('Password is required'),
 });
 
 type FormData = yup.InferType<typeof schema>;
 
 export default function SignUp() {
-  const dispatch = useDispatch();
-  const { control, handleSubmit, formState: { errors } } = useForm<FormData>({
-    resolver: yupResolver(schema),
-    defaultValues: {
-      password: "",
-    },
-  });
-
+  const dispatch = useDispatch<AppDispatch>();
+  const router = useRouter();
   const [isPasswordHidden, setIsPasswordHidden] = useState(true);
 
+  const {
+    control,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<FormData>({
+    resolver: yupResolver(schema),
+    defaultValues: { name: '', phone: '', email: '', password: '' },
+  });
+
   const togglePasswordVisibility = () => {
-    setIsPasswordHidden(prev => !prev);
+    setIsPasswordHidden((prev) => !prev);
   };
-  
+
+
   const onSubmit = async (data: FormData) => {
+    console.log('Form Data:', data);
+
     try {
-      dispatch(setLoading(true));
-      // Here you would typically make an API call to register the user
-      // For demo purposes, we'll simulate a successful registration
-      const mockResponse = {
-        token: 'mock_token',
-        user: {
-          name: data.name,
-          email: data.email,
-          phone: data.phone,
-        },
-      };
-      dispatch(setCredentials(mockResponse));
+      await dispatch(
+        signup({
+          Name: data.name,
+          Phone: data.phone,
+          Email: data.email,
+          Password: data.password,
+        })
+      );
+      router.push('/Login'); 
     } catch (error) {
-      dispatch(setError(error instanceof Error ? error.message : 'Registration failed'));
-    } finally {
-      dispatch(setLoading(false));
+      console.error('Signup failed:', error);
     }
   };
+  
 
   return (
-    <ScrollView contentContainerStyle={styles.scrollContainer} keyboardShouldPersistTaps="handled">
-      <View style={styles.container}>
-        <Image
-          source={require('../../assets/images/car4.png')}
-          style={styles.image}
-        />
-        <Text style={styles.title}>Create Your Account</Text>
+    <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={{ flex: 1 }}>
+      <ScrollView contentContainerStyle={styles.scrollContainer} keyboardShouldPersistTaps="handled">
+        <View style={styles.container}>
+          <Image source={require('../../assets/images/car4.png')} style={styles.image} />
+          <Text style={styles.title}>Create Your Account</Text>
 
-        <Controller
-          control={control}
-          name="name"
-          render={({ field: { onChange, value } }) => (
-            <View style={styles.inputContainer}>
-              <Text style={styles.label}>Name</Text>
-              <View style={styles.inputWrapper}>
-                <Feather name="user" size={20} color="black" />
-                <TextInput
-                  style={styles.input}
-                  onChangeText={onChange}
-                  value={value}
-                  placeholder="Enter name"
-                />
-              </View>
-              {errors.name && (
-                <Text style={styles.errorText}>{errors.name.message}</Text>
-              )}
-            </View>
-          )}
-        />
-
-        <Controller
-          control={control}
-          name="phone"
-          render={({ field: { onChange, value } }) => (
-            <View style={styles.inputContainer}>
-              <Text style={styles.label}>Phone No.</Text>
-              <View style={styles.inputWrapper}>
-                <Feather name="phone" size={18} />
-                <TextInput
-                  style={styles.input}
-                  onChangeText={onChange}
-                  value={value}
-                  placeholder="Enter phone number"
-                  keyboardType="phone-pad"
-                />
-              </View>
-              {errors.phone && (
-                <Text style={styles.errorText}>{errors.phone.message}</Text>
-              )}
-            </View>
-          )}
-        />
-
-        <Controller
-          control={control}
-          name="email"
-          render={({ field: { onChange, value } }) => (
-            <View style={styles.inputContainer}>
-              <Text style={styles.label}>Email</Text>
-              <View style={styles.inputWrapper}>
-                <Feather name="mail" size={18} />
-                <TextInput
-                  style={styles.input}
-                  onChangeText={onChange}
-                  value={value}
-                  placeholder="Enter email"
-                  keyboardType="email-address"
-                  autoCapitalize="none"
-                />
-              </View>
-              {errors.email && (
-                <Text style={styles.errorText}>{errors.email.message}</Text>
-              )}
-            </View>
-          )}
-        />
-
-        <Controller
-          control={control}
-          name="password"
-          defaultValue=""
-          render={({ field: { onChange, value } }) => (
-            <View style={styles.inputContainer}>
-              <Text style={styles.label}>Password</Text>
-              <View style={styles.inputWrapper}>
-                <Feather name="lock" size={18} />
-                <TextInput
-                  style={styles.inputPassword}
-                  onChangeText={onChange}
-                  value={value}
-                  placeholder="Enter password"
-                  secureTextEntry={isPasswordHidden}
-                />
-                <TouchableOpacity
-                  onPress={togglePasswordVisibility}
-                  style={styles.icon}
-                >
-                  <Feather
-                    name={isPasswordHidden ? "eye-off" : "eye"}
-                    size={18}
+          <Controller
+            control={control}
+            name="name"
+            render={({ field: { onChange, value } }) => (
+              <View style={styles.inputContainer}>
+                <Text style={styles.label}>Name</Text>
+                <View style={styles.inputWrapper}>
+                  <Feather name="user" size={20} color="black" />
+                  <TextInput
+                    style={styles.input}
+                    onChangeText={onChange}
+                    value={value}
+                    placeholder="Enter name"
+                    placeholderTextColor="#999"
+                    autoCorrect={false}
                   />
-                </TouchableOpacity>
+                </View>
+                {errors.name && <Text style={styles.errorText}>{errors.name.message}</Text>}
               </View>
-              {errors.password && (
-                <Text style={styles.errorText}>{errors.password.message}</Text>
-              )}
-            </View>
-          )}
-        />
+            )}
+          />
 
-        <TouchableOpacity
-          style={styles.button}
-          onPress={handleSubmit(onSubmit)}
-        >
-          <Text style={styles.buttonText}>Sign Up</Text>
-        </TouchableOpacity>
+          <Controller
+            control={control}
+            name="phone"
+            render={({ field: { onChange, value } }) => (
+              <View style={styles.inputContainer}>
+                <Text style={styles.label}>Phone No.</Text>
+                <View style={styles.inputWrapper}>
+                  <Feather name="phone" size={18} />
+                  <TextInput
+                    style={styles.input}
+                    onChangeText={onChange}
+                    value={value}
+                    placeholder="Enter phone number"
+                    placeholderTextColor="#999"
+                    keyboardType="phone-pad"
+                    autoCorrect={false}
+                  />
+                </View>
+                {errors.phone && <Text style={styles.errorText}>{errors.phone.message}</Text>}
+              </View>
+            )}
+          />
 
-        <View style={styles.footer}>
-          <Text style={styles.footerText}>Already have an account? </Text>
-          <Link href="/Login" asChild>
-            <TouchableOpacity>
-              <Text style={styles.footerLink}>Log in</Text>
-            </TouchableOpacity>
-          </Link>
+          <Controller
+            control={control}
+            name="email"
+            render={({ field: { onChange, value } }) => (
+              <View style={styles.inputContainer}>
+                <Text style={styles.label}>Email</Text>
+                <View style={styles.inputWrapper}>
+                  <Feather name="mail" size={18} />
+                  <TextInput
+                    style={styles.input}
+                    onChangeText={onChange}
+                    value={value}
+                    placeholder="Enter email"
+                    placeholderTextColor="#999"
+                    keyboardType="email-address"
+                    autoCapitalize="none"
+                    autoCorrect={false}
+                  />
+                </View>
+                {errors.email && <Text style={styles.errorText}>{errors.email.message}</Text>}
+              </View>
+            )}
+          />
+
+          <Controller
+            control={control}
+            name="password"
+            render={({ field: { onChange, value } }) => (
+              <View style={styles.inputContainer}>
+                <Text style={styles.label}>Password</Text>
+                <View style={styles.inputWrapper}>
+                  <Feather name="lock" size={18} />
+                  <TextInput
+                    style={styles.inputPassword}
+                    onChangeText={onChange}
+                    value={value}
+                    placeholder="Enter password"
+                    placeholderTextColor="#999"
+                    secureTextEntry={isPasswordHidden}
+                    autoCorrect={false}
+                  />
+                  <TouchableOpacity onPress={togglePasswordVisibility} style={styles.icon}>
+                    <Feather name={isPasswordHidden ? 'eye-off' : 'eye'} size={18} />
+                  </TouchableOpacity>
+                </View>
+                {errors.password && <Text style={styles.errorText}>{errors.password.message}</Text>}
+              </View>
+            )}
+          />
+
+          <TouchableOpacity style={styles.button} onPress={handleSubmit(onSubmit)}>
+            <Text style={styles.buttonText}>Sign Up</Text>
+          </TouchableOpacity>
+
+          <View style={styles.footer}>
+            <Text style={styles.footerText}>Already have an account? </Text>
+            <Link href="/Login" asChild>
+              <TouchableOpacity>
+                <Text style={styles.footerLink}>Log in</Text>
+              </TouchableOpacity>
+            </Link>
+          </View>
         </View>
-      </View>
-    </ScrollView>
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 }
 
@@ -192,6 +181,7 @@ const styles = StyleSheet.create({
   scrollContainer: {
     flexGrow: 1,
     backgroundColor: '#FFB300',
+    fontFamily: 'PlusJakartaSans-Bold',
   },
   container: {
     flex: 1,

@@ -77,6 +77,7 @@ export default function SignUp() {
                     onChangeText={onChange}
                     value={value}
                     placeholder="Enter name"
+                    keyboardType="default"
                     placeholderTextColor="#999"
                     autoCorrect={false}
                   />
@@ -165,7 +166,7 @@ export default function SignUp() {
 
           <View style={styles.footer}>
             <Text style={styles.footerText}>Already have an account? </Text>
-            <Link href="/Login" asChild>
+            <Link href="/Home" asChild>
               <TouchableOpacity>
                 <Text style={styles.footerLink}>Log in</Text>
               </TouchableOpacity>

@@ -8,15 +8,20 @@ import * as Location from 'expo-location';
 import Feather from '@expo/vector-icons/Feather';
 import { useDispatch } from 'react-redux';
 import { AppDispatch } from '../../store/store';
-import { useRouter } from 'expo-router';
+import { useNavigation, useRouter } from 'expo-router';
+import BottomNav from '@/components/BottomNav';
+import Chat from './Chat';
+import Profile from './Profile';
 
 export default function Home() {
     const dispatch = useDispatch<AppDispatch>();
+    const [currentPath, setCurrentPath] = useState('Home');
     const router = useRouter();
-  
+    const navigation = useNavigation();
+
     const handleLogout = async () => {
-      await dispatch(logout());
-      router.replace('../Login');
+        await dispatch(logout());
+        router.replace('../Login');
     };
 
     // const [location, setLocation] = useState<Location.LocationObject | null>(null);
@@ -97,15 +102,13 @@ export default function Home() {
                     </MapView>
                 </View> */}
 
-                <TouchableOpacity style={styles.bookButton}>
+                <TouchableOpacity
+                    style={styles.bookButton}
+                    onPress={() => router.push('/(tabs)/Ride')}>
                     <Text style={styles.bookButtonText}>Book Your Ride →</Text>
                 </TouchableOpacity>
 
-                <View style={styles.bottomNav}>
-                    <Feather name="home" size={24} color="white" />
-                    <Feather name="file-text" size={24} color="white" />
-                    <Feather name="user" size={24} color="white" />
-                </View>
+                <BottomNav />
             </ScrollView>
         </SafeAreaView>
     );
@@ -116,6 +119,16 @@ const styles = StyleSheet.create({
         flex: 1,
         backgroundColor: '#FFB300',
         fontFamily: 'PlusJakartaSans-Bold',
+    },
+    screen: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    screenText: {
+        fontSize: 24,
+        color: 'white',
+        fontWeight: 'bold',
     },
     scrollContent: {
         flexGrow: 1,
@@ -152,6 +165,7 @@ const styles = StyleSheet.create({
         flex: 1,
         fontSize: 16,
         color: '#000',
+        paddingLeft: 10
     },
     locationText: {
         fontSize: 18,
@@ -183,16 +197,5 @@ const styles = StyleSheet.create({
         color: '#FFF',
         fontSize: 18,
         fontWeight: '600',
-    },
-    bottomNav: {
-        flexDirection: 'row',
-        justifyContent: 'space-around',
-        padding: 4,
-        backgroundColor: '#333333',
-        marginHorizontal: 20,
-        marginTop: 40,
-        height: 80,
-        borderRadius: 40,
-        alignItems: 'center',
     }
 });

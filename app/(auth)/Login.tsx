@@ -126,6 +126,7 @@ export default function Login() {
                     value={value}
                     placeholder="Enter email"
                     keyboardType="email-address"
+                    placeholderTextColor="#999"
                     autoCapitalize="none"
                   />
                 </View>
@@ -147,6 +148,7 @@ export default function Login() {
                     onChangeText={onChange}
                     value={value}
                     placeholder="Enter password"
+                    placeholderTextColor="#999"
                     secureTextEntry={isPasswordHidden}
                     autoCapitalize="none"
                   />

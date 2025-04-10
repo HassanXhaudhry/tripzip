@@ -1,174 +1,155 @@
-// import { View, Text, StyleSheet, Image, TouchableOpacity, ScrollView } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, StyleSheet, Pressable, Image, ScrollView } from 'react-native';
+import { PencilLine, CircleCheck as CheckCircle2, ImageUp } from 'lucide-react-native';
+import { launchImageLibrary } from 'react-native-image-picker';
+import BottomNav from '@/components/BottomNav';
 
-// export default function Profile() {
-//   return (
-//     <ScrollView style={styles.container}>
-//       <View style={styles.header}>
-//         <TouchableOpacity style={styles.settingsButton}>
-//         <Settings {...{ size: 24, color: "#000" }} />
+interface ProfileField {
+  label: string;
+  value: string;
+  isVerified?: boolean;
+}
 
-//         </TouchableOpacity>
-//       </View>
+export default function Profile() {
+  const [profileImage, setProfileImage] = useState<string | null>(null);(
+    "https://images.unsplash.com/photo-1633332755192-727a05c4013d?w=400"
+  );
 
-//       <View style={styles.profileSection}>
-//         <View style={styles.avatarContainer}>
-//           <Image
-//             source={{ uri: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?q=80&w=200' }}
-//             style={styles.avatar}
-//           />
-//           <TouchableOpacity style={styles.editButton}>
-//           <Edit2 {...{ size: 20, color: "#fff" }} />
-//           </TouchableOpacity>
-//         </View>
-//         <Text style={styles.name}>John Doe</Text>
-//         <Text style={styles.bio}>Software Developer | React Native Expert</Text>
-//         <TouchableOpacity style={styles.shareButton}>
-//         <Share2 {...{ size: 20, color: "#000" }} />
-//           <Text style={styles.shareText}>Share Profile</Text>
-//         </TouchableOpacity>
-//       </View>
+  const profileFields: ProfileField[] = [
+    { label: 'Full Name', value: 'Muhammad Fawad Iqbal' },
+    { label: 'Email', value: 'fawadiqbal274@gmail.com', isVerified: true },
+    { label: 'Phone number', value: '+92 3334513912' },
+  ];
 
-//       <View style={styles.statsContainer}>
-//         <View style={styles.statItem}>
-//           <Text style={styles.statNumber}>128</Text>
-//           <Text style={styles.statLabel}>Posts</Text>
-//         </View>
-//         <View style={styles.statDivider} />
-//         <View style={styles.statItem}>
-//           <Text style={styles.statNumber}>5.2K</Text>
-//           <Text style={styles.statLabel}>Followers</Text>
-//         </View>
-//         <View style={styles.statDivider} />
-//         <View style={styles.statItem}>
-//           <Text style={styles.statNumber}>482</Text>
-//           <Text style={styles.statLabel}>Following</Text>
-//         </View>
-//       </View>
+  const selectImage = () => {
+    launchImageLibrary({ mediaType: 'photo' }, (response) => {
+      if (response.assets && response.assets.length > 0) {
+        setProfileImage(response.assets?.[0]?.uri ?? null);
 
-//       <View style={styles.section}>
-//         <Text style={styles.sectionTitle}>Recent Activity</Text>
-//         {[1, 2, 3].map((item) => (
-//           <View key={item} style={styles.activityCard}>
-//             <Text style={styles.activityTitle}>Activity {item}</Text>
-//             <Text style={styles.activityTime}>2 hours ago</Text>
-//           </View>
-//         ))}
-//       </View>
-//     </ScrollView>
-//   );
-// }
+      }
+    });
+  };
 
-// const styles = StyleSheet.create({
-//   container: {
-//     flex: 1,
-//     backgroundColor: '#fff',
-//   },
-//   header: {
-//     padding: 20,
-//     paddingTop: 60,
-//     alignItems: 'flex-end',
-//   },
-//   settingsButton: {
-//     padding: 8,
-//     backgroundColor: '#f5f5f5',
-//     borderRadius: 12,
-//   },
-//   profileSection: {
-//     alignItems: 'center',
-//     paddingHorizontal: 20,
-//   },
-//   avatarContainer: {
-//     position: 'relative',
-//     marginBottom: 16,
-//   },
-//   avatar: {
-//     width: 120,
-//     height: 120,
-//     borderRadius: 60,
-//   },
-//   editButton: {
-//     position: 'absolute',
-//     right: 0,
-//     bottom: 0,
-//     backgroundColor: '#000',
-//     padding: 8,
-//     borderRadius: 20,
-//   },
-//   name: {
-//     fontSize: 24,
-//     fontWeight: 'bold',
-//     marginBottom: 8,
-//     color: '#000',
-//   },
-//   bio: {
-//     fontSize: 16,
-//     color: '#666',
-//     textAlign: 'center',
-//     marginBottom: 16,
-//   },
-//   shareButton: {
-//     flexDirection: 'row',
-//     alignItems: 'center',
-//     backgroundColor: '#f5f5f5',
-//     padding: 12,
-//     borderRadius: 20,
-//     gap: 8,
-//   },
-//   shareText: {
-//     fontSize: 16,
-//     color: '#000',
-//     fontWeight: '500',
-//   },
-//   statsContainer: {
-//     flexDirection: 'row',
-//     justifyContent: 'space-between',
-//     paddingVertical: 24,
-//     paddingHorizontal: 40,
-//     marginTop: 24,
-//     backgroundColor: '#f9f9f9',
-//   },
-//   statItem: {
-//     alignItems: 'center',
-//   },
-//   statNumber: {
-//     fontSize: 20,
-//     fontWeight: 'bold',
-//     color: '#000',
-//     marginBottom: 4,
-//   },
-//   statLabel: {
-//     fontSize: 14,
-//     color: '#666',
-//   },
-//   statDivider: {
-//     width: 1,
-//     backgroundColor: '#ddd',
-//   },
-//   section: {
-//     padding: 20,
-//   },
-//   sectionTitle: {
-//     fontSize: 20,
-//     fontWeight: 'bold',
-//     marginBottom: 16,
-//     color: '#000',
-//   },
-//   activityCard: {
-//     backgroundColor: '#fff',
-//     borderRadius: 12,
-//     padding: 16,
-//     marginBottom: 12,
-//     borderWidth: 1,
-//     borderColor: '#f1f1f1',
-//   },
-//   activityTitle: {
-//     fontSize: 16,
-//     fontWeight: '600',
-//     marginBottom: 4,
-//     color: '#000',
-//   },
-//   activityTime: {
-//     fontSize: 14,
-//     color: '#666',
-//   },
-// });
+  const renderField = ({ label, value, isVerified }: ProfileField) => (
+    <View key={label} style={styles.fieldContainer}>
+      <Text style={styles.fieldLabel}>{label}</Text>
+      <View style={styles.fieldValueContainer}>
+        <View style={styles.valueWrapper}>
+          <Text style={styles.fieldValue}>{value}</Text>
+          {isVerified && (
+            <View style={styles.verifiedContainer}>
+              <CheckCircle2 size={12} color="#34C759" />
+              <Text style={styles.verifiedText}>Verified</Text>
+            </View>
+          )}
+        </View>
+        <Pressable style={styles.editButton}>
+          <PencilLine size={16} color="#666" />
+        </Pressable>
+      </View>
+    </View>
+  );
+
+  return (
+    <View style={styles.container}>
+      <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
+        <Text style={styles.title}>Your profile</Text>
+
+        <View style={styles.avatarContainer}>
+        <Image source={{ uri: profileImage as string }} style={styles.avatar} resizeMode="cover" />
+
+          <Pressable style={styles.verifiedBadge} onPress={selectImage}>
+            <ImageUp size={16} color="#fff" />
+          </Pressable>
+        </View>
+
+        <View style={styles.fieldsContainer}>
+          {profileFields.map(renderField)}
+        </View>
+      </ScrollView>
+
+      <BottomNav />
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#FFB300',
+    padding: 20,
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: '600',
+    color: '#000',
+    marginBottom: 16,
+  },
+  avatarContainer: {
+    alignSelf: 'center',
+    marginBottom: 16,
+    position: 'relative',
+  },
+  avatar: {
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    borderWidth: 4,
+    borderColor: '#fff',
+  },
+  verifiedBadge: {
+    position: 'absolute',
+    right: 0,
+    bottom: 0,
+    backgroundColor: '#34C759',
+    borderRadius: 12,
+    padding: 4,
+    borderWidth: 2,
+    borderColor: '#fff',
+  },
+  fieldsContainer: {
+    backgroundColor: '#fff',
+    borderRadius: 16,
+    padding: 16,
+    marginHorizontal: 10,
+  },
+  fieldContainer: {
+    marginBottom: 8,
+  },
+  fieldLabel: {
+    fontSize: 14,
+    color: '#666',
+    marginBottom: 8,
+  },
+  fieldValueContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    backgroundColor: '#F6F8FA',
+    paddingVertical: 4,
+    paddingHorizontal: 8,
+    borderRadius: 10,
+  },
+  valueWrapper: {
+    flex: 1,
+  },
+  fieldValue: {
+    fontSize: 12,
+    color: '#000',
+    fontWeight: '500',
+  },
+  editButton: {
+    padding: 8,
+  },
+  verifiedContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 4,
+  },
+  verifiedText: {
+    fontSize: 10,
+    color: '#34C759',
+    marginLeft: 4,
+  },
+});
+

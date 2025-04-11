@@ -33,7 +33,7 @@ export default function Login() {
         text2: 'Welcome back to the app',
         position: 'top',
         visibilityTime: 3000,
-        topOffset: 50,
+        topOffset: 40,
         props: { 
           style: { 
             borderLeftColor: '#4CAF50', 
@@ -57,7 +57,7 @@ export default function Login() {
         text2: formattedError || 'Please check your credentials and try again',
         position: 'top',
         visibilityTime: 4000,
-        topOffset: 50,
+        topOffset: 40,
         props: { 
           style: { 
             borderLeftColor: '#FF5252', 
@@ -94,7 +94,7 @@ export default function Login() {
         text1: 'Login request failed',
         text2: 'Network error or server issue. Please try again.',
         position: 'top',
-        topOffset: 50,
+        topOffset: 40,
         props: { 
           style: { 
             borderLeftColor: '#FF5252', 
@@ -117,7 +117,7 @@ export default function Login() {
             name="email"
             render={({ field: { onChange, value } }) => (
               <View style={styles.inputContainer}>
-                <Text style={styles.label}>Email</Text>
+                <Text style={styles.label}>Email Address</Text>
                 <View style={styles.inputWrapper}>
                   <Feather name="mail" size={18} />
                   <TextInput
@@ -167,7 +167,7 @@ export default function Login() {
             disabled={loading}
           >
             <Text style={styles.buttonText}>
-              {loading ? 'Signing In...' : 'Sign In'}
+              {loading ? 'Logging In...' : 'Login'}
             </Text>
           </TouchableOpacity>
 
@@ -175,7 +175,7 @@ export default function Login() {
             <Text style={styles.footerText}>Don't have an account? </Text>
             <Link href="/Signup" asChild>
               <TouchableOpacity>
-                <Text style={styles.footerLink}>Sign up</Text>
+                <Text style={styles.footerLink}>Register</Text>
               </TouchableOpacity>
             </Link>
           </View>

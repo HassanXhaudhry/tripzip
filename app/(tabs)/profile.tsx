@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, Pressable, Image, ScrollView } from 'react-native';
-import { PencilLine, CircleCheck as CheckCircle2, ImageUp } from 'lucide-react-native';
+import { View, Text, StyleSheet, Pressable, Image, ScrollView, TouchableOpacity } from 'react-native';
+import { PencilLine, CircleCheck as CheckCircle2, ImageUp, ChevronLeft } from 'lucide-react-native';
 import { launchImageLibrary } from 'react-native-image-picker';
 import BottomNav from '@/components/BottomNav';
+import { useRouter } from 'expo-router';
 
 interface ProfileField {
   label: string;
@@ -11,7 +12,8 @@ interface ProfileField {
 }
 
 export default function Profile() {
-  const [profileImage, setProfileImage] = useState<string | null>(null);(
+  const router = useRouter();
+  const [profileImage, setProfileImage] = useState<string | null>(null); (
     "https://images.unsplash.com/photo-1633332755192-727a05c4013d?w=400"
   );
 
@@ -53,10 +55,14 @@ export default function Profile() {
   return (
     <View style={styles.container}>
       <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
-        <Text style={styles.title}>Your profile</Text>
-
+        <View style={styles.header}>
+          <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
+            <ChevronLeft size={24} color="#000" style={styles.chevron}/>
+          </TouchableOpacity>
+          <Text style={styles.title}>Your profile</Text>
+        </View>
         <View style={styles.avatarContainer}>
-        <Image source={{ uri: profileImage as string }} style={styles.avatar} resizeMode="cover" />
+          <Image source={{ uri: profileImage as string }} style={styles.avatar} resizeMode="cover" />
 
           <Pressable style={styles.verifiedBadge} onPress={selectImage}>
             <ImageUp size={16} color="#fff" />
@@ -77,18 +83,27 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#FFB300',
-    padding: 20,
   },
   title: {
-    fontSize: 24,
-    fontWeight: '600',
+    fontSize: 20,
+    fontWeight: 'bold',
     color: '#000',
-    marginBottom: 16,
   },
   avatarContainer: {
     alignSelf: 'center',
     marginBottom: 16,
     position: 'relative',
+  },
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 20,
+  },
+  backButton: {
+    marginRight: 15,
+  },
+  chevron: {
+    marginTop: 3
   },
   avatar: {
     width: 100,

@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, TextInput, TouchableOpacity, Platform, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, TextInput, TouchableOpacity, Platform, ScrollView, BackHandler } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 //import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
 import { MaterialIcons } from '@expo/vector-icons';
@@ -10,14 +10,29 @@ import { useDispatch } from 'react-redux';
 import { AppDispatch } from '../../store/store';
 import { useNavigation, useRouter } from 'expo-router';
 import BottomNav from '@/components/BottomNav';
-import Chat from './Chat';
-import Profile from './Profile';
 
 export default function Home() {
     const dispatch = useDispatch<AppDispatch>();
-    const [currentPath, setCurrentPath] = useState('Home');
     const router = useRouter();
     const navigation = useNavigation();
+
+    useEffect(() => {
+        const backHandler = BackHandler.addEventListener(
+            'hardwareBackPress',
+            () => {
+                // Get current navigation state
+                const state = navigation.getState();
+                const currentRoute = state?.routes[state.index]?.name;
+                // Exit app only if on Home screen
+                if (currentRoute === 'Home') {
+                    BackHandler.exitApp();
+                    return true; // Prevent default back behavior
+                }
+                return false; // Allow default back behavior
+            }
+        );
+        return () => backHandler.remove();
+    }, [navigation]);
 
     const handleLogout = async () => {
         await dispatch(logout());
@@ -116,7 +131,9 @@ export default function Home() {
 
 const styles = StyleSheet.create({
     container: {
-        flex: 1,
+        width: '100%',
+        height: '100%',
+        flexDirection: 'column',
         backgroundColor: '#FFB300',
         fontFamily: 'PlusJakartaSans-Bold',
     },

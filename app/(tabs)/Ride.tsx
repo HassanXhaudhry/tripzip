@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, ScrollView, Platform, Modal } from 'react-native';
-import { MapPin, ArrowRight, Users, Calendar, Clock, Crosshair, Map, Plus, Minus } from 'lucide-react-native';
-import { Link } from 'expo-router';
+import { MapPin, ArrowRight, Users, Calendar, Clock, Crosshair, Map, Plus, Minus, ChevronLeft } from 'lucide-react-native';
+import { Link, useRouter } from 'expo-router';
 import DateTimePicker from '@react-native-community/datetimepicker';
 
 type DateTimePickerEventType = {
@@ -17,7 +17,8 @@ type PassengerCategory = {
     count: number;
 };
 
-export default function Ride() {
+export default function BookingScreen() {
+    const router = useRouter();
     const [pickupLocation, setPickupLocation] = useState<string>('');
     const [dropLocation, setDropLocation] = useState<string>('');
     const [date, setDate] = useState<Date>(new Date());
@@ -36,11 +37,8 @@ export default function Ride() {
         { type: 'Children', ageRange: '2-12 years', count: 0 },
         { type: 'Infants', ageRange: '0-2 years', count: 0 },
     ]);
-
-    // Fix for "Type 'string' is not assignable to type 'never'" error
     const [stops, setStops] = useState<Array<string>>([]);
 
-    // Format date for display
     const formatDate = (date: Date): string => {
         return date.toLocaleDateString('en-US', {
             year: 'numeric',
@@ -49,7 +47,6 @@ export default function Ride() {
         });
     };
 
-    // Format time for display
     const formatTime = (time: Date): string => {
         return time.toLocaleTimeString('en-US', {
             hour: '2-digit',
@@ -57,7 +54,6 @@ export default function Ride() {
         });
     };
 
-    // Handle date picker changes - using _ to indicate unused parameter
     const onDateChange = (_: DateTimePickerEventType, selectedDate?: Date): void => {
         setShowDatePicker(false);
         if (selectedDate) {
@@ -65,7 +61,6 @@ export default function Ride() {
         }
     };
 
-    // Handle time picker changes - using _ to indicate unused parameter
     const onTimeChange = (_: DateTimePickerEventType, selectedTime?: Date): void => {
         setShowTimePicker(false);
         if (selectedTime) {
@@ -73,7 +68,6 @@ export default function Ride() {
         }
     };
 
-    // Handle return date picker changes - using _ to indicate unused parameter
     const onReturnDateChange = (_: DateTimePickerEventType, selectedDate?: Date): void => {
         setShowReturnDatePicker(false);
         if (selectedDate) {
@@ -81,7 +75,6 @@ export default function Ride() {
         }
     };
 
-    // Handle return time picker changes - using _ to indicate unused parameter
     const onReturnTimeChange = (_: DateTimePickerEventType, selectedTime?: Date): void => {
         setShowReturnTimePicker(false);
         if (selectedTime) {
@@ -89,7 +82,6 @@ export default function Ride() {
         }
     };
 
-    // Add a stop
     const addStop = (): void => {
         if (stops.length < 3) {
             setStops([...stops, '']);
@@ -98,38 +90,29 @@ export default function Ride() {
         }
     };
 
-    // Update stop location - explicit types for parameters
     const updateStop = (index: number, value: string): void => {
-        // Fix for "const newStops: never[]" error
         const newStops: Array<string> = [...stops];
         newStops[index] = value;
         setStops(newStops);
     };
 
-    // Remove a stop - explicit type for parameter
     const removeStop = (index: number): void => {
-        // Fix for "const newStops: never[]" error
         const newStops: Array<string> = [...stops];
         newStops.splice(index, 1);
         setStops(newStops);
     };
 
-    // Get current location (mock implementation)
     const getCurrentLocation = (): void => {
-        // In a real app, you would use Expo's Location API
         Alert.alert('Location Access', 'Getting your current location...');
         setTimeout(() => {
             setPickupLocation('Current Location');
         }, 1000);
     };
 
-    // Open map to select location (mock implementation)
     const openMap = (): void => {
         Alert.alert('Map Selection', 'Opening map to select destination...');
-        // In a real app, you would integrate with a map picker component
     };
 
-    // Validate booking form
     const validateForm = (): boolean => {
         if (!pickupLocation) {
             Alert.alert('Error', 'Please enter a pickup location');
@@ -147,7 +130,6 @@ export default function Ride() {
         }
 
         if (hasReturn) {
-            // Check if return date/time is after initial date/time
             const pickupDateTime = new Date(
                 date.getFullYear(),
                 date.getMonth(),
@@ -186,59 +168,29 @@ export default function Ride() {
         return passengers.reduce((sum, passenger) => sum + passenger.count, 0);
     };
 
-    // Book a ride
     const bookRide = (): void => {
         if (!validateForm()) return;
-
-        setIsLoading(true);
-
-        // Create booking object
-        const bookingDetails = {
-            pickupLocation,
-            dropLocation,
-            stops,
-            pickupDate: formatDate(date),
-            pickupTime: formatTime(time),
-            passengers: getTotalPassengers(),
-            passengerDetails: passengers,
-            hasReturn,
-            returnDate: hasReturn ? formatDate(returnDate) : null,
-            returnTime: hasReturn ? formatTime(returnTime) : null,
-        };
-
-        console.log('Booking submitted:', bookingDetails);
-
-        // Mock API call
-        setTimeout(() => {
-            setIsLoading(false);
-            Alert.alert(
-                'Booking Successful',
-                `Your ride from ${pickupLocation} to ${dropLocation} has been booked for ${formatDate(date)} at ${formatTime(time)}.`,
-                [
-                    {
-                        text: 'OK',
-                        onPress: () => {
-                            // Reset form or navigate to confirmation screen
-                            // In a real app, you'd navigate to a confirmation screen
-                            // navigation.navigate('BookingConfirmation', { bookingDetails });
-                        }
-                    }
-                ]
-            );
-        }, 2000);
+        router.push('/RideNearby');
     };
 
     return (
         <ScrollView contentContainerStyle={styles.scrollContainer} keyboardShouldPersistTaps="handled">
             <View style={styles.container}>
                 <View style={styles.header}>
-                    <Text style={styles.title}>Book Your Ride</Text>
-                    <TouchableOpacity
-                        style={styles.stopButton}
-                        onPress={addStop}>
-                        <Text style={styles.stopButtonText}>+ stop </Text>
-                        <MapPin size={14} color="#000000" />
-                    </TouchableOpacity>
+                    <View style={styles.headerText}>
+                        <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
+                            <ChevronLeft size={24} color="#000" style={styles.chevron} />
+                        </TouchableOpacity>
+                        <Text style={styles.title}>Book Your Ride</Text>
+                    </View>
+                    <View>
+                        <TouchableOpacity
+                            style={styles.stopButton}
+                            onPress={addStop}>
+                            <Text style={styles.stopButtonText}>+ stop </Text>
+                            <MapPin size={14} color="#000000" />
+                        </TouchableOpacity>
+                    </View>
                 </View>
 
                 <View style={styles.form}>
@@ -257,7 +209,6 @@ export default function Ride() {
                         </TouchableOpacity>
                     </View>
 
-                    {/* Display added stops */}
                     {stops.map((stop, index) => (
                         <View key={index}>
                             <Text style={styles.label}>Stop {index + 1}</Text>
@@ -468,6 +419,17 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         marginBottom: 20,
     },
+    headerText: {
+        flexDirection: 'row',
+        alignItems: 'center'
+    },
+
+    backButton: {
+        marginRight: 15,
+    },
+    chevron: {
+        marginTop: 3
+    },
     removeText: {
         fontWeight: 'semibold',
         fontSize: 18,
@@ -478,7 +440,7 @@ const styles = StyleSheet.create({
         fontSize: 16,
     },
     title: {
-        fontSize: 24,
+        fontSize: 22,
         fontWeight: 'bold',
         color: '#000',
     },

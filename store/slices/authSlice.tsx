@@ -8,6 +8,7 @@ interface AuthState {
   isAuthenticated: boolean;
   loading: boolean;
   error: string | null;
+  user: any | null;
 }
 
 const initialState: AuthState = {
@@ -15,16 +16,21 @@ const initialState: AuthState = {
   isAuthenticated: false,
   loading: false,
   error: null,
+  user: null,
 };
 
 // Load token from AsyncStorage on app startup
 export const loadToken = createAsyncThunk('auth/loadToken', async () => {
   try {
     const token = await AsyncStorage.getItem('token');
-    return token;
+    const userData = await AsyncStorage.getItem('user');
+    return {
+      token,
+      user: userData ? JSON.parse(userData) : null,
+    };
   } catch (error) {
     console.error('Error loading token:', error);
-    return null;
+    return { token: null, user: null };
   }
 });
 
@@ -44,8 +50,12 @@ export const login = createAsyncThunk(
       console.log("Response Data:", data);
       
       if (response.ok && data?.message === "Login Successfully") {
-        // Optionally, store token in AsyncStorage if needed:
-        // await AsyncStorage.setItem('token', data.token);
+        if (data.token) {
+          await AsyncStorage.setItem('token', data.token);
+        }
+        if (data.user) {
+          await AsyncStorage.setItem('user', JSON.stringify(data.user));
+        }
         return data;
       } else {
         return rejectWithValue(data?.message || 'Login failed');
@@ -61,10 +71,12 @@ export const login = createAsyncThunk(
 export const signup = createAsyncThunk(
   'auth/signup',
   async (
-    userData: { Name: string; Email: string; Phone: string; Password: string },
+    userData: { FullName: string; Email: string; PhoneNo: string; Password: string },
     { rejectWithValue }
   ) => {
     try {
+      console.log("Sending signup request with data:", userData);
+      
       const response = await fetch(`${API_URL}/customer_register`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -72,14 +84,21 @@ export const signup = createAsyncThunk(
       });
       
       const data = await response.json();
-      console.log("Signup Response:", response);
+      console.log("Signup Response Status:", response.status);
       console.log("Response Data:", data);
       
       if (response.ok && data?.message === "Signup Successfully") {
-        // Optionally, store token in AsyncStorage if needed:
-        // await AsyncStorage.setItem('token', data.token);
+        // If the API returns a token on signup, store it
+        if (data.token) {
+          await AsyncStorage.setItem('token', data.token);
+        }
+        // If the API returns user data, store it
+        if (data.user) {
+          await AsyncStorage.setItem('user', JSON.stringify(data.user));
+        }
         return data;
       } else {
+        // Return any error message from the API
         return rejectWithValue(data?.message || 'Signup failed');
       }
     } catch (error) {
@@ -93,8 +112,9 @@ export const signup = createAsyncThunk(
 export const logout = createAsyncThunk('auth/logout', async () => {
   try {
     await AsyncStorage.removeItem('token');
+    await AsyncStorage.removeItem('user');
   } catch (error) {
-    console.error('Error clearing token:', error);
+    console.error('Error clearing data:', error);
   }
   return null; 
 });
@@ -111,8 +131,9 @@ const authSlice = createSlice({
     builder
       // Load Token
       .addCase(loadToken.fulfilled, (state, action) => {
-        state.token = action.payload;
-        state.isAuthenticated = !!action.payload;
+        state.token = action.payload.token;
+        state.user = action.payload.user;
+        state.isAuthenticated = !!action.payload.token;
       })
       // Login Cases
       .addCase(login.pending, (state) => {
@@ -121,7 +142,8 @@ const authSlice = createSlice({
       })
       .addCase(login.fulfilled, (state, action) => {
         state.loading = false;
-        state.token = action.payload;
+        state.token = action.payload.token;
+        state.user = action.payload.user;
         state.isAuthenticated = true;
       })
       .addCase(login.rejected, (state, action) => {
@@ -135,8 +157,15 @@ const authSlice = createSlice({
       })
       .addCase(signup.fulfilled, (state, action) => {
         state.loading = false;
-        state.token = action.payload;
-        state.isAuthenticated = true;
+        // Only set token and user if they were returned from the API
+        // Some APIs might not authenticate users immediately after signup
+        if (action.payload.token) {
+          state.token = action.payload.token;
+          state.isAuthenticated = true;
+        }
+        if (action.payload.user) {
+          state.user = action.payload.user;
+        }
       })
       .addCase(signup.rejected, (state, action) => {
         state.loading = false;
@@ -145,6 +174,7 @@ const authSlice = createSlice({
       // Logout Case
       .addCase(logout.fulfilled, (state) => {
         state.token = null;
+        state.user = null;
         state.isAuthenticated = false;
       });
   },

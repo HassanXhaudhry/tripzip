@@ -10,18 +10,17 @@ interface FlightItem {
     text: string;
     secondText?: string;
 }
-type RootStackParamList = {
-    Home: undefined;
-    Signup: undefined;
-    // Add other routes here
-};
+// type RootStackParamList = {
+//     Home: undefined;
+//     Signup: undefined;
+// };
 const AnimatedFlatList = Animated.createAnimatedComponent(FlatList) as React.ForwardRefExoticComponent<
     FlatListProps<FlightItem> & React.RefAttributes<FlatList<FlightItem>>
 >;
-type HomeScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Home'>;
-const Home: React.FC = () => {
+//type HomeScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Main'>;
+const Main: React.FC = () => {
     
-    const navigation = useNavigation<HomeScreenNavigationProp>();
+    //const navigation = useNavigation<HomeScreenNavigationProp>();
     const router = useRouter();
     const flatlistRef = useRef<FlatList<FlightItem>>(null);
     const screenWidth = Dimensions.get("window").width;
@@ -374,4 +373,4 @@ const styles = StyleSheet.create({
     }
 });
 
-export default Home;
+export default Main;

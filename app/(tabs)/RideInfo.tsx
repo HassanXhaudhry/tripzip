@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
-import { useRouter } from 'expo-router';
+import { Link, useRouter } from 'expo-router';
 import { ChevronLeft, MapPin, Users, Clock, Route, ArrowRight } from 'lucide-react-native';
 
 export default function RideInfoScreen() {
@@ -77,10 +77,12 @@ export default function RideInfoScreen() {
           </View>
         </View>
 
+        <Link href="/CustomerInfo" asChild>
         <TouchableOpacity style={styles.nextButton}>
           <Text style={styles.nextButtonText}>Next</Text>
           <ArrowRight size={24} color="#FFF" />
         </TouchableOpacity>
+        </Link>
       </View>
     </View>
     </ScrollView>

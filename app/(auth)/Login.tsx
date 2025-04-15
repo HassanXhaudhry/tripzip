@@ -170,7 +170,11 @@ export default function Login() {
               {loading ? 'Logging In...' : 'Login'}
             </Text>
           </TouchableOpacity>
-
+          <Link href="/Home" asChild>
+              <TouchableOpacity>
+                <Text style={styles.footerLink}>Home</Text>
+              </TouchableOpacity>
+            </Link>
           <View style={styles.footer}>
             <Text style={styles.footerText}>Don't have an account? </Text>
             <Link href="/Signup" asChild>

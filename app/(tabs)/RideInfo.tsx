@@ -80,7 +80,7 @@ export default function RideInfoScreen() {
         <Link href="/CustomerInfo" asChild>
         <TouchableOpacity style={styles.nextButton}>
           <Text style={styles.nextButtonText}>Next</Text>
-          <ArrowRight size={24} color="#FFF" />
+          <ArrowRight size={18} color="#FFF" />
         </TouchableOpacity>
         </Link>
       </View>
@@ -183,11 +183,11 @@ const styles = StyleSheet.create({
   nextButton: {
     backgroundColor: '#000',
     borderRadius: 25,
-    padding: 15,
+    padding: 12,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    gap: 10,
+    gap: 8,
     marginTop: 20,
   },
   nextButtonText: {

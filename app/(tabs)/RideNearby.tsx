@@ -111,10 +111,13 @@ const styles = StyleSheet.create({
     color: '#000',
   },
   seePlanButton: {
-    backgroundColor: '#000',
-    borderRadius: 25,
-    padding: 15,
+    backgroundColor: '#000000',
+    borderRadius: 36,
+    paddingVertical: 12,
+    paddingLeft: 16,
+    paddingRight: 16,
     alignItems: 'center',
+    marginTop: 15,
   },
   seePlanButtonText: {
     color: '#FFF',

@@ -153,7 +153,7 @@ export default function SignUp() {
       <ScrollView contentContainerStyle={styles.scrollContainer} keyboardShouldPersistTaps="handled">
         <View style={styles.container}>
           <Image source={require('../../assets/images/car4.png')} style={styles.image} />
-          <Text style={styles.title}>Create Your Taxica Account</Text>
+          <Text style={styles.title}>Create Your Taxican Account</Text>
 
           <Controller
             control={control}

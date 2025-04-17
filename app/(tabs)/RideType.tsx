@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
 import { Link, useRouter } from 'expo-router';
-import { ChevronLeft, Car, Users, Gauge, Calendar, Box } from 'lucide-react-native';
+import { ChevronLeft, Car, Users, Gauge, Calendar, Box, ArrowRight } from 'lucide-react-native';
 
 export default function RideTypeScreen() {
   const router = useRouter();
@@ -60,7 +60,7 @@ export default function RideTypeScreen() {
         <Link href="/RideInfo" asChild>
           <TouchableOpacity style={styles.chooseButton}>
             <Text style={styles.chooseButtonText}>Choose</Text>
-            <ChevronLeft size={24} color="#FFF" style={{ transform: [{ rotate: '180deg' }] }} />
+            <ArrowRight size={18} color="#FFF" />
           </TouchableOpacity>
         </Link>
       </View>
@@ -147,11 +147,12 @@ const styles = StyleSheet.create({
   chooseButton: {
     backgroundColor: '#000',
     borderRadius: 25,
-    padding: 15,
+    padding: 12,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    gap: 10,
+    gap: 8,
+    marginTop: 20,
   },
   chooseButtonText: {
     color: '#FFF',

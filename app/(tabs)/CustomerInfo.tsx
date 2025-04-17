@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { View, Text, TextInput, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
 import { router } from 'expo-router';
-import { Check, ChevronLeft } from 'lucide-react-native';
+import { ArrowRight, Check, ChevronLeft } from 'lucide-react-native';
 import { Controller, useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
@@ -58,14 +58,14 @@ export default function CustomerInfo() {
             </View>
 
             <View style={styles.form}>
-            <Controller
+                <Controller
                     control={control}
                     name="name"
                     render={({ field: { onChange, value } }) => (
                         <View style={styles.inputContainer}>
                             <Text style={styles.label}>Flight No.</Text>
                             <View style={styles.inputWrapper}>
-                                <Feather  size={20} color="black" />
+                                <Feather size={20} color="black" />
                                 <TextInput
                                     style={styles.input}
                                     onChangeText={onChange}
@@ -177,18 +177,19 @@ export default function CustomerInfo() {
                 <View style={styles.inputGroup}>
                     <Text style={styles.label}>Address</Text>
                     <TextInput
-                        style={[styles.input, styles.addressInput]}
+                        style={styles.addressInput}
                         placeholder="Enter Address"
-                        multiline = {true}
-                        numberOfLines = {4}
+                        multiline={true}
+                        numberOfLines={4}
                         value={formData.address}
                         onChangeText={(text) => setFormData({ ...formData, address: text })}
                     />
                 </View>
 
-                {/* <TouchableOpacity style={styles.button} onPress={handleSubmit}>
-          <Text style={styles.buttonText}>BOOK NOW →</Text>
-        </TouchableOpacity> */}
+                <TouchableOpacity style={styles.button} onPress={handleSubmit}>
+                    <Text style={styles.buttonText}>BOOK NOW</Text>
+                    <ArrowRight size={18} color="#FFF" />
+                </TouchableOpacity>
             </View>
         </ScrollView>
     );
@@ -237,7 +238,16 @@ const styles = StyleSheet.create({
         backgroundColor: '#fff',
         paddingLeft: 15
     },
-
+    inputAddressWrapper: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+        position: 'relative',
+        borderRadius: 20,
+        height: 42,
+        backgroundColor: '#fff',
+        paddingLeft: 15
+    },
     errorText: {
         color: 'red',
         marginTop: 5,
@@ -261,6 +271,13 @@ const styles = StyleSheet.create({
     addressInput: {
         height: 100,
         textAlignVertical: 'top',
+        flex: 1,
+        borderRadius: 20,
+        paddingLeft: 12,
+        paddingTop: 10,
+        fontSize: 14,
+        outlineStyle: 'none',
+        backgroundColor: '#fff'
     },
     hint: {
         fontSize: 12,
@@ -268,14 +285,16 @@ const styles = StyleSheet.create({
         color: '#666',
     },
     button: {
-        backgroundColor: 'black',
+        backgroundColor: '#000',
         borderRadius: 25,
-        padding: 16,
+        padding: 12,
+        flexDirection: 'row',
         alignItems: 'center',
-        marginTop: 20,
+        justifyContent: 'center',
+        gap: 8
     },
     buttonText: {
-        color: 'white',
+        color: '#FFF',
         fontSize: 16,
         fontWeight: 'bold',
     },

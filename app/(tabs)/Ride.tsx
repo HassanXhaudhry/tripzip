@@ -346,7 +346,7 @@ export default function BookingScreen() {
                         <Text style={styles.bookButtonText}>
                             {isLoading ? 'BOOKING...' : 'BOOK TAXI'}
                         </Text>
-                        {!isLoading && <ArrowRight size={20} color="#FFF" />}
+                        {!isLoading && <ArrowRight size={18} color="#FFF" />}
                     </TouchableOpacity>
                 </View>
 
@@ -467,10 +467,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         backgroundColor: '#000000',
         borderRadius: 36,
-        paddingTop: 10,
-        paddingBottom: 10,
-        paddingLeft: 16,
-        paddingRight: 16,
+        paddingVertical:12,
         justifyContent: 'center',
         marginTop: 25,
     },
@@ -549,7 +546,7 @@ const styles = StyleSheet.create({
     returnButton: {
         backgroundColor: '#000',
         borderRadius: 25,
-        paddingVertical: 15,
+        paddingVertical: 12,
         alignItems: 'center'
     },
     returnButtonText: {
@@ -559,9 +556,9 @@ const styles = StyleSheet.create({
     bookButton: {
         backgroundColor: '#000',
         borderRadius: 25,
-        paddingVertical: 15,
+        paddingVertical: 12,
         alignItems: 'center',
-        marginBottom: 20,
+        marginBottom: 10,
         flexDirection: 'row',
         justifyContent: 'center',
         marginTop: 25
@@ -637,9 +634,9 @@ const styles = StyleSheet.create({
     confirmButton: {
         backgroundColor: '#FFA500',
         borderRadius: 25,
-        paddingVertical: 15,
+        paddingVertical: 12,
         alignItems: 'center',
-        marginTop: 20,
+        marginTop: 26,
     },
     confirmButtonText: {
         color: '#000',

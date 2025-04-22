@@ -1,7 +1,7 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-
-const API_URL = 'http://115.186.137.140:8181';
+import axios from 'axios';
+import { API_URL } from '../../constants/apiConstants';
 
 interface AuthState {
   token: string | null;
@@ -19,7 +19,7 @@ const initialState: AuthState = {
   user: null,
 };
 
-// Load token from AsyncStorage on app startup
+// Load token and user from AsyncStorage
 export const loadToken = createAsyncThunk('auth/loadToken', async () => {
   try {
     const token = await AsyncStorage.getItem('token');
@@ -34,40 +34,33 @@ export const loadToken = createAsyncThunk('auth/loadToken', async () => {
   }
 });
 
-// Login Action using fetch
+// Login Action using axios
 export const login = createAsyncThunk(
   'auth/login',
   async (userData: { Email: string; Password: string }, { rejectWithValue }) => {
     try {
-      const response = await fetch(`${API_URL}/customer_login`, {
-        method: 'POST',
+      const response = await axios.post(`${API_URL}/customer_login`, userData, {
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(userData),
       });
-      
-      const data = await response.json();
-      console.log("Login Response:", response);
-      console.log("Response Data:", data);
-      
-      if (response.ok && data?.message === "Login Successfully") {
-        if (data.token) {
-          await AsyncStorage.setItem('token', data.token);
-        }
-        if (data.user) {
-          await AsyncStorage.setItem('user', JSON.stringify(data.user));
-        }
+
+      const data = response.data;
+      console.log("Login Response:", data);
+
+      if (data?.message === "Login Successfully") {
+        if (data.token) await AsyncStorage.setItem('token', data.token);
+        if (data.user) await AsyncStorage.setItem('user', JSON.stringify(data.user));
         return data;
       } else {
         return rejectWithValue(data?.message || 'Login failed');
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error("Login Error:", error);
-      return rejectWithValue('An unexpected error occurred');
+      return rejectWithValue(error?.response?.data?.message || 'An unexpected error occurred');
     }
   }
 );
 
-// Signup Action using fetch
+// Signup Action using axios
 export const signup = createAsyncThunk(
   'auth/signup',
   async (
@@ -76,47 +69,37 @@ export const signup = createAsyncThunk(
   ) => {
     try {
       console.log("Sending signup request with data:", userData);
-      
-      const response = await fetch(`${API_URL}/customer_register`, {
-        method: 'POST',
+
+      const response = await axios.post(`${API_URL}/customer_register`, userData, {
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(userData),
       });
-      
-      const data = await response.json();
-      console.log("Signup Response Status:", response.status);
-      console.log("Response Data:", data);
-      
-      if (response.ok && data?.message === "Signup Successfully") {
-        // If the API returns a token on signup, store it
-        if (data.token) {
-          await AsyncStorage.setItem('token', data.token);
-        }
-        // If the API returns user data, store it
-        if (data.user) {
-          await AsyncStorage.setItem('user', JSON.stringify(data.user));
-        }
+
+      const data = response.data;
+      console.log("Signup Response:", data);
+
+      if (data?.message === "Signup Successfully") {
+        if (data.token) await AsyncStorage.setItem('token', data.token);
+        if (data.user) await AsyncStorage.setItem('user', JSON.stringify(data.user));
         return data;
       } else {
-        // Return any error message from the API
         return rejectWithValue(data?.message || 'Signup failed');
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error("Signup Error:", error);
-      return rejectWithValue('An unexpected error occurred');
+      return rejectWithValue(error?.response?.data?.message || 'An unexpected error occurred');
     }
   }
 );
 
-// Logout Action
+// Logout
 export const logout = createAsyncThunk('auth/logout', async () => {
   try {
     await AsyncStorage.removeItem('token');
     await AsyncStorage.removeItem('user');
   } catch (error) {
-    console.error('Error clearing data:', error);
+    console.error('Error clearing AsyncStorage:', error);
   }
-  return null; 
+  return null;
 });
 
 const authSlice = createSlice({
@@ -129,13 +112,13 @@ const authSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      // Load Token
+      // Load token
       .addCase(loadToken.fulfilled, (state, action) => {
         state.token = action.payload.token;
         state.user = action.payload.user;
         state.isAuthenticated = !!action.payload.token;
       })
-      // Login Cases
+      // Login
       .addCase(login.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -150,15 +133,13 @@ const authSlice = createSlice({
         state.loading = false;
         state.error = action.payload as string;
       })
-      // Signup Cases
+      // Signup
       .addCase(signup.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
       .addCase(signup.fulfilled, (state, action) => {
         state.loading = false;
-        // Only set token and user if they were returned from the API
-        // Some APIs might not authenticate users immediately after signup
         if (action.payload.token) {
           state.token = action.payload.token;
           state.isAuthenticated = true;
@@ -171,7 +152,7 @@ const authSlice = createSlice({
         state.loading = false;
         state.error = action.payload as string;
       })
-      // Logout Case
+      // Logout
       .addCase(logout.fulfilled, (state) => {
         state.token = null;
         state.user = null;

@@ -1,7 +1,5 @@
 import React, { useRef, useState } from 'react';
 import { Animated, Dimensions, FlatList, FlatListProps, Image, TouchableOpacity, View, Text, NativeSyntheticEvent, NativeScrollEvent, ListRenderItem, StyleSheet } from "react-native";
-import { useNavigation } from '@react-navigation/native';
-import { StackNavigationProp } from '@react-navigation/stack';
 import { useRouter } from 'expo-router';
 
 interface FlightItem {
@@ -10,17 +8,10 @@ interface FlightItem {
     text: string;
     secondText?: string;
 }
-// type RootStackParamList = {
-//     Home: undefined;
-//     Signup: undefined;
-// };
 const AnimatedFlatList = Animated.createAnimatedComponent(FlatList) as React.ForwardRefExoticComponent<
     FlatListProps<FlightItem> & React.RefAttributes<FlatList<FlightItem>>
 >;
-//type HomeScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Main'>;
 const Main: React.FC = () => {
-    
-    //const navigation = useNavigation<HomeScreenNavigationProp>();
     const router = useRouter();
     const flatlistRef = useRef<FlatList<FlightItem>>(null);
     const screenWidth = Dimensions.get("window").width;
@@ -205,12 +196,12 @@ const Main: React.FC = () => {
                 });
             }
         } else {
-            router.push('/(auth)/Signup');
+            router.push('/(auth)/Login');
         }
     };
 
     const handleSkip = () => {
-        router.push('/(auth)/Signup');
+        router.push('/(auth)/Login');
     };
 
     React.useEffect(() => {

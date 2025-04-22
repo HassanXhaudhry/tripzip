@@ -1,13 +1,13 @@
-import { useFrameworkReady } from "@/hooks/useFrameworkReady";
 import { Stack } from "expo-router";
 import React, { useEffect } from "react";
 import { useSelector, useDispatch, Provider } from "react-redux";
 import { RootState, store, AppDispatch } from "../store/store";
 import { loadToken } from "../store/slices/authSlice";
+import * as SplashScreen from 'expo-splash-screen';
 
 function AuthLayout() {
-  useFrameworkReady();
   const dispatch = useDispatch<AppDispatch>();
+  SplashScreen.preventAutoHideAsync();
   const { isAuthenticated } = useSelector((state: RootState) => state.auth);
   
   useEffect(() => {

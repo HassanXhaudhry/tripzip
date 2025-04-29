@@ -1,8 +1,21 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, ScrollView, Platform, Modal } from 'react-native';
-import { MapPin, ArrowRight, Users, Calendar, Clock, Crosshair, Map, Plus, Minus, ChevronLeft } from 'lucide-react-native';
-import { Link, useRouter } from 'expo-router';
+import { MapPin, ArrowRight, Users, Calendar, Clock, ChevronLeft } from 'lucide-react-native';
+import { useRouter } from 'expo-router';
 import DateTimePicker from '@react-native-community/datetimepicker';
+import { useDispatch, useSelector } from 'react-redux';
+import { AppDispatch, RootState } from '@/store/store';
+import { 
+    setPickupLocation, 
+    setDropLocation, 
+    setDate, 
+    setTime, 
+    setReturnDate, 
+    setReturnTime, 
+    setHasReturn, 
+    setPassengers, 
+    setStops 
+} from '@/store/slices/rideSlice';
 
 type DateTimePickerEventType = {
     type: string;
@@ -11,33 +24,52 @@ type DateTimePickerEventType = {
     };
 };
 
-type PassengerCategory = {
-    type: string;
-    ageRange: string;
-    count: number;
-};
+// Use the same Passenger interface from the Redux store
+interface Passenger {
+  count: number;
+  type?: string;
+  ageRange?: string;
+}
 
-export default function BookingScreen() {
+export default function Ride() {
     const router = useRouter();
-    const [pickupLocation, setPickupLocation] = useState<string>('');
-    const [dropLocation, setDropLocation] = useState<string>('');
-    const [date, setDate] = useState<Date>(new Date());
-    const [time, setTime] = useState<Date>(new Date());
-    const [returnDate, setReturnDate] = useState<Date>(new Date());
-    const [returnTime, setReturnTime] = useState<Date>(new Date());
+    const dispatch = useDispatch<AppDispatch>();
+    
+    // Access ride state from redux
+    const {
+        pickupLocation,
+        dropLocation,
+        date: rideDate,
+        time: rideTime,
+        returnDate: rideReturnDate,
+        returnTime: rideReturnTime,
+        hasReturn,
+        passengers,
+        stops
+    } = useSelector((state: RootState) => state.ride);
+
+    // Initialize local state
     const [showDatePicker, setShowDatePicker] = useState<boolean>(false);
     const [showTimePicker, setShowTimePicker] = useState<boolean>(false);
     const [showReturnDatePicker, setShowReturnDatePicker] = useState<boolean>(false);
     const [showReturnTimePicker, setShowReturnTimePicker] = useState<boolean>(false);
     const [isLoading, setIsLoading] = useState<boolean>(false);
-    const [hasReturn, setHasReturn] = useState(false);
     const [showPassengerModal, setShowPassengerModal] = useState(false);
-    const [passengers, setPassengers] = useState<PassengerCategory[]>([
-        { type: 'Adults', ageRange: '12+ years', count: 0 },
-        { type: 'Children', ageRange: '2-12 years', count: 0 },
-        { type: 'Infants', ageRange: '0-2 years', count: 0 },
-    ]);
-    const [stops, setStops] = useState<Array<string>>([]);
+    
+    // Parse dates from ISO strings
+    const currentDate = new Date(rideDate);
+    const currentTime = new Date(rideTime);
+    const returnDateObj = new Date(rideReturnDate);
+    const returnTimeObj = new Date(rideReturnTime);
+
+    // Initialize passengers if empty
+    const [localPassengers, setLocalPassengers] = useState<Passenger[]>(
+        passengers.length > 0 ? passengers : [
+            { count: 0, type: 'Adult', ageRange: '12+ years' },
+            { count: 0, type: 'Child', ageRange: '2-11 years' },
+            { count: 0, type: 'Infant', ageRange: 'Under 2 years' }
+        ]
+    );
 
     const formatDate = (date: Date): string => {
         return date.toLocaleDateString('en-US', {
@@ -57,34 +89,34 @@ export default function BookingScreen() {
     const onDateChange = (_: DateTimePickerEventType, selectedDate?: Date): void => {
         setShowDatePicker(false);
         if (selectedDate) {
-            setDate(selectedDate);
+            dispatch(setDate(selectedDate.toISOString()));
         }
     };
 
     const onTimeChange = (_: DateTimePickerEventType, selectedTime?: Date): void => {
         setShowTimePicker(false);
         if (selectedTime) {
-            setTime(selectedTime);
+            dispatch(setTime(selectedTime.toISOString()));
         }
     };
 
     const onReturnDateChange = (_: DateTimePickerEventType, selectedDate?: Date): void => {
         setShowReturnDatePicker(false);
         if (selectedDate) {
-            setReturnDate(selectedDate);
+            dispatch(setReturnDate(selectedDate.toISOString()));
         }
     };
 
     const onReturnTimeChange = (_: DateTimePickerEventType, selectedTime?: Date): void => {
         setShowReturnTimePicker(false);
         if (selectedTime) {
-            setReturnTime(selectedTime);
+            dispatch(setReturnTime(selectedTime.toISOString()));
         }
     };
 
     const addStop = (): void => {
         if (stops.length < 3) {
-            setStops([...stops, '']);
+            dispatch(setStops([...stops, '']));
         } else {
             Alert.alert('Maximum Stops', 'You can add a maximum of 3 stops.');
         }
@@ -93,24 +125,13 @@ export default function BookingScreen() {
     const updateStop = (index: number, value: string): void => {
         const newStops: Array<string> = [...stops];
         newStops[index] = value;
-        setStops(newStops);
+        dispatch(setStops(newStops));
     };
 
     const removeStop = (index: number): void => {
         const newStops: Array<string> = [...stops];
         newStops.splice(index, 1);
-        setStops(newStops);
-    };
-
-    const getCurrentLocation = (): void => {
-        Alert.alert('Location Access', 'Getting your current location...');
-        setTimeout(() => {
-            setPickupLocation('Current Location');
-        }, 1000);
-    };
-
-    const openMap = (): void => {
-        Alert.alert('Map Selection', 'Opening map to select destination...');
+        dispatch(setStops(newStops));
     };
 
     const validateForm = (): boolean => {
@@ -131,19 +152,19 @@ export default function BookingScreen() {
 
         if (hasReturn) {
             const pickupDateTime = new Date(
-                date.getFullYear(),
-                date.getMonth(),
-                date.getDate(),
-                time.getHours(),
-                time.getMinutes()
+                currentDate.getFullYear(),
+                currentDate.getMonth(),
+                currentDate.getDate(),
+                currentTime.getHours(),
+                currentTime.getMinutes()
             );
 
             const returnDateTime = new Date(
-                returnDate.getFullYear(),
-                returnDate.getMonth(),
-                returnDate.getDate(),
-                returnTime.getHours(),
-                returnTime.getMinutes()
+                returnDateObj.getFullYear(),
+                returnDateObj.getMonth(),
+                returnDateObj.getDate(),
+                returnTimeObj.getHours(),
+                returnTimeObj.getMinutes()
             );
 
             if (returnDateTime <= pickupDateTime) {
@@ -155,22 +176,27 @@ export default function BookingScreen() {
     };
 
     const handlePassengerChange = (index: number, increment: boolean) => {
-        setPassengers(prev => prev.map((passenger, i) => {
+        const updatedPassengers = localPassengers.map((passenger, i) => {
             if (i === index) {
                 const newCount = increment ? passenger.count + 1 : Math.max(0, passenger.count - 1);
                 return { ...passenger, count: newCount };
             }
             return passenger;
-        }));
+        });
+        
+        setLocalPassengers(updatedPassengers);
+        dispatch(setPassengers(updatedPassengers));
     };
 
     const getTotalPassengers = () => {
-        return passengers.reduce((sum, passenger) => sum + passenger.count, 0);
+        return localPassengers.reduce((sum, passenger) => sum + passenger.count, 0);
     };
 
     const bookRide = (): void => {
         if (!validateForm()) return;
-        router.push('/RideNearby');
+        
+        // All data is already in Redux state, so we can just navigate
+        router.push('/TaxiType');
     };
 
     return (
@@ -200,13 +226,10 @@ export default function BookingScreen() {
                         <TextInput
                             style={styles.input}
                             placeholder="From location"
-                            value={pickupLocation}
-                            onChangeText={setPickupLocation}
+                            value={pickupLocation || ''}
+                            onChangeText={(text) => dispatch(setPickupLocation(text))}
                             placeholderTextColor="#666"
                         />
-                        <TouchableOpacity style={styles.locationButton} onPress={getCurrentLocation}>
-                            <Crosshair size={18} color="#000" style={styles.location} />
-                        </TouchableOpacity>
                     </View>
 
                     {stops.map((stop, index) => (
@@ -234,13 +257,10 @@ export default function BookingScreen() {
                         <TextInput
                             style={styles.input}
                             placeholder="To location"
-                            value={dropLocation}
-                            onChangeText={setDropLocation}
+                            value={dropLocation || ''}
+                            onChangeText={(text) => dispatch(setDropLocation(text))}
                             placeholderTextColor="#666"
                         />
-                        <TouchableOpacity style={styles.locationButton} onPress={openMap}>
-                            <Map size={18} color="#000" style={styles.location} />
-                        </TouchableOpacity>
                     </View>
 
                     <Text style={styles.label}>Pick Up Date</Text>
@@ -249,12 +269,12 @@ export default function BookingScreen() {
                         onPress={() => setShowDatePicker(true)}>
                         <Calendar size={18} color="#666" style={styles.inputIcon} />
                         <Text style={styles.dateTimeText}>
-                            {formatDate(date)}
+                            {formatDate(currentDate)}
                         </Text>
                     </TouchableOpacity>
                     {showDatePicker && (
                         <DateTimePicker
-                            value={date}
+                            value={currentDate}
                             mode="date"
                             display={Platform.OS === 'ios' ? 'spinner' : 'default'}
                             onChange={onDateChange}
@@ -268,12 +288,12 @@ export default function BookingScreen() {
                         onPress={() => setShowTimePicker(true)}>
                         <Clock size={18} color="#666" style={styles.inputIcon} />
                         <Text style={styles.dateTimeText}>
-                            {formatTime(time)}
+                            {formatTime(currentTime)}
                         </Text>
                     </TouchableOpacity>
                     {showTimePicker && (
                         <DateTimePicker
-                            value={time}
+                            value={currentTime}
                             mode="time"
                             display={Platform.OS === 'ios' ? 'spinner' : 'default'}
                             onChange={onTimeChange}
@@ -282,7 +302,7 @@ export default function BookingScreen() {
 
                     <TouchableOpacity
                         style={[styles.button, styles.returnButton]}
-                        onPress={() => setHasReturn(!hasReturn)}>
+                        onPress={() => dispatch(setHasReturn(!hasReturn))}>
                         <Text style={styles.returnButtonText}>
                             {hasReturn ? 'REMOVE RETURN' : 'ADD RETURN'}
                         </Text>
@@ -296,16 +316,16 @@ export default function BookingScreen() {
                                 onPress={() => setShowReturnDatePicker(true)}>
                                 <Calendar size={18} color="#666" style={styles.inputIcon} />
                                 <Text style={styles.dateTimeText}>
-                                    {formatDate(returnDate)}
+                                    {formatDate(returnDateObj)}
                                 </Text>
                             </TouchableOpacity>
                             {showReturnDatePicker && (
                                 <DateTimePicker
-                                    value={returnDate}
+                                    value={returnDateObj}
                                     mode="date"
                                     display={Platform.OS === 'ios' ? 'spinner' : 'default'}
                                     onChange={onReturnDateChange}
-                                    minimumDate={date}
+                                    minimumDate={currentDate}
                                 />
                             )}
 
@@ -315,12 +335,12 @@ export default function BookingScreen() {
                                 onPress={() => setShowReturnTimePicker(true)}>
                                 <Clock size={18} color="#666" style={styles.inputIcon} />
                                 <Text style={styles.dateTimeText}>
-                                    {formatTime(returnTime)}
+                                    {formatTime(returnTimeObj)}
                                 </Text>
                             </TouchableOpacity>
                             {showReturnTimePicker && (
                                 <DateTimePicker
-                                    value={returnTime}
+                                    value={returnTimeObj}
                                     mode="time"
                                     display={Platform.OS === 'ios' ? 'spinner' : 'default'}
                                     onChange={onReturnTimeChange}
@@ -363,7 +383,7 @@ export default function BookingScreen() {
                         <View style={styles.modalContent} onStartShouldSetResponder={() => true}>
                             <Text style={styles.modalTitle}>Select Passengers</Text>
 
-                            {passengers.map((passenger, index) => (
+                            {localPassengers.map((passenger, index) => (
                                 <View key={passenger.type} style={styles.passengerRow}>
                                     <View>
                                         <Text style={styles.passengerType}>{passenger.type}</Text>
@@ -373,13 +393,13 @@ export default function BookingScreen() {
                                         <TouchableOpacity
                                             style={styles.counterButton}
                                             onPress={() => handlePassengerChange(index, false)}>
-                                            <Minus size={20} color="#000" />
+                                            <Text style={styles.counterButtonText}>-</Text>
                                         </TouchableOpacity>
                                         <Text style={styles.counterText}>{passenger.count}</Text>
                                         <TouchableOpacity
                                             style={styles.counterButton}
                                             onPress={() => handlePassengerChange(index, true)}>
-                                            <Plus size={20} color="#000" />
+                                            <Text style={styles.counterButtonText}>+</Text>
                                         </TouchableOpacity>
                                     </View>
                                 </View>
@@ -397,7 +417,6 @@ export default function BookingScreen() {
         </ScrollView>
     );
 }
-
 
 const styles = StyleSheet.create({
     scrollContainer: {
@@ -453,6 +472,10 @@ const styles = StyleSheet.create({
         backgroundColor: 'rgba(0, 0, 0, 0.1)',
         borderRadius: 20,
     },
+    counterButtonText: {
+        fontSize: 20,
+        fontWeight: 'bold',
+    },
     stopButtonText: {
         color: '#000',
         fontSize: 14,
@@ -467,7 +490,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         backgroundColor: '#000000',
         borderRadius: 36,
-        paddingVertical:12,
+        paddingVertical: 12,
         justifyContent: 'center',
         marginTop: 25,
     },

@@ -11,4 +11,7 @@ declare module 'react-native-vector-icons/Feather' {
 
   const Icon: FC<IconProps>;
   export default Icon;
+
+  
 }
+

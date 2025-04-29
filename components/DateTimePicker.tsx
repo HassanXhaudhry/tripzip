@@ -382,7 +382,7 @@
 //       />
       
 //       <Text style={styles.selectedValue}>
-//         Selected: {date.toLocaleDateString()}
+//         Selected: {date.toeDateString()}
 //       </Text>
       
 //       <Text style={styles.label}>Time Only:</Text>

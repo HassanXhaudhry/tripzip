@@ -9,7 +9,7 @@ function AuthLayout() {
   const dispatch = useDispatch<AppDispatch>();
   SplashScreen.preventAutoHideAsync();
   const { isAuthenticated } = useSelector((state: RootState) => state.auth);
-  
+
   useEffect(() => {
     dispatch(loadToken());
   }, [dispatch]);

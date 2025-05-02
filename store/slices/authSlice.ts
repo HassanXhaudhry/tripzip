@@ -19,7 +19,10 @@ export interface User {
   phone?: string;
   address?: string;
   password?: string;
-  cus_uid: any
+  cus_uid: any;
+  cus_fullname: string;
+  cus_email: any;
+  cus_username: string
 }
 
 interface AuthState {

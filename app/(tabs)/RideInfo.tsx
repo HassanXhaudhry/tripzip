@@ -42,19 +42,26 @@ export default function RideInfo() {
     passengers: Passenger[];
     stops: string[];
   };
-  
+
 
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [rideEstimation, setRideEstimation] = useState<RideEstimationDetails | null>(null);
 
   useEffect(() => {
-    if (!pickupLocation || !dropLocation || !selectedVehicle) {
-      if (!selectedVehicle) {
-        router.replace('/TaxiType');
+    const timeout = setTimeout(() => {
+      if (!pickupLocation || !dropLocation || !selectedVehicle) {
+        if (!selectedVehicle) {
+          router.replace('/TaxiType');
+        }
+      } else {
+        fetchRideEstimation();
       }
-      return;
-    }
+    }, 0); 
+  
+    return () => clearTimeout(timeout);
+  }, [pickupLocation, dropLocation, selectedVehicle, stops]);
+  
 
     const fetchRideEstimation = async () => {
       try {
@@ -73,8 +80,6 @@ export default function RideInfo() {
       }
     };
 
-    fetchRideEstimation();
-  }, [pickupLocation, dropLocation, selectedVehicle, stops]);
 
   const formatDate = (dateString: string): string => {
     const date = new Date(dateString);
@@ -94,7 +99,7 @@ export default function RideInfo() {
   }
 
   const calculatePrice = (): string => {
-    if (!selectedVehicle || !rideEstimation) return '0.00';
+    if (!selectedVehicle || !rideEstimation) return '1.00';
     return (selectedVehicle.price_per_km * rideEstimation.distance).toFixed(2);
   };
 
@@ -245,8 +250,10 @@ export default function RideInfo() {
         </View>
       </View>
 
-      <TouchableOpacity style={styles.confirmButton}>
-        <Text style={styles.confirmButtonText}>Confirm Booking</Text>
+      <TouchableOpacity
+        style={styles.confirmButton}
+        onPress={() => router.push('/CustomerInfo')}>
+        <Text style={styles.confirmButtonText}>Next</Text>
         <ArrowRight size={18} color="#FFF" />
       </TouchableOpacity>
     </ScrollView>
@@ -416,16 +423,14 @@ const styles = StyleSheet.create({
     color: '#000',
   },
   confirmButton: {
+    backgroundColor: '#000',
+    borderRadius: 25,
+    padding: 12,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    gap: 8,
-    backgroundColor: '#000',
-    borderRadius: 25,
-    paddingVertical: 14,
-    paddingHorizontal: 24,
+    gap: 10,
     marginTop: 20,
-    alignSelf: 'center',
   },
   confirmButtonText: {
     color: '#FFF',

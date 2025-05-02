@@ -2,13 +2,14 @@ import { View, Text, StyleSheet, TextInput, TouchableOpacity, Platform, ScrollVi
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { MaterialIcons } from '@expo/vector-icons';
 import { logout } from '../../store/slices/authSlice'
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Fragment } from 'react';
 import Feather from '@expo/vector-icons/Feather';
 import { AppDispatch } from '../../store/store';
 import { useNavigation, useRouter } from 'expo-router';
 import BottomNav from '@/components/BottomNav';
 import { RootState } from '../../store/store';
 import { useDispatch, useSelector } from 'react-redux';
+import { ArrowRight } from 'lucide-react-native';
 
 
 export default function Home() {
@@ -42,41 +43,30 @@ export default function Home() {
     };
 
     return (
+        <Fragment>
         <View style={styles.container}>
             <SafeAreaView style={styles.safeArea}>
                 <ScrollView contentContainerStyle={styles.scrollContent}>
                     <View style={styles.header}>
                     <Text style={styles.welcomeText}>
-                        Welcome,{'\n'}{fullname || 'Guest'}!
+                        TripZip
                     </Text>
                         <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
                             <MaterialIcons name="logout" size={24} color="black" />
                         </TouchableOpacity>
                     </View>
-                    <View style={styles.searchContainer}>
-                        <Feather name="search" size={18} />
-                        <TextInput
-                            style={styles.searchInput}
-                            placeholder="Where do you want to go?"
-                            placeholderTextColor="#666"
-                            returnKeyType="search"
-                            onSubmitEditing={() => {/* trigger search */ }}
-                        />
-                    </View>
-
-                    <Text style={styles.locationText}>Your current location</Text>
 
                     <TouchableOpacity
                         style={styles.bookButton}
                         onPress={() => router.push('/(tabs)/Ride')}>
-                        <Text style={styles.bookButtonText}>Book Your Ride →</Text>
+                        <Text style={styles.bookButtonText}>Book Your Ride</Text>
+                        <ArrowRight size={18} color="#FFF" />
                     </TouchableOpacity>
                 </ScrollView>
             </SafeAreaView>
-            
-            {/* BottomNav is outside the ScrollView */}
             <BottomNav />
         </View>
+        </Fragment>
     );
 }
 
@@ -101,7 +91,7 @@ const styles = StyleSheet.create({
     },
     scrollContent: {
         flexGrow: 1,
-        paddingBottom: 90, // Add space for the bottom navigation
+        paddingBottom: 90,
     },
     header: {
         flexDirection: 'row',
@@ -111,30 +101,12 @@ const styles = StyleSheet.create({
         paddingTop: 10,
     },
     welcomeText: {
-        fontSize: 20,
+        fontSize: 24,
+        fontStyle: 'italic',
         fontWeight: 'bold',
-        color: '#000',
-    },
+    },    
     logoutButton: {
         padding: 8,
-    },
-    searchContainer: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        backgroundColor: '#FFF',
-        margin: 20,
-        borderRadius: 25,
-        paddingHorizontal: 15,
-        height: 50
-    },
-    searchIcon: {
-        marginRight: 10,
-    },
-    searchInput: {
-        flex: 1,
-        fontSize: 16,
-        color: '#000',
-        paddingLeft: 10
     },
     locationText: {
         fontSize: 18,
@@ -144,7 +116,7 @@ const styles = StyleSheet.create({
         marginBottom: 10,
     },
     mapContainer: {
-        height: 300, // Fixed height for the map
+        height: 300, 
         marginHorizontal: 20,
         borderRadius: 20,
         overflow: 'hidden',
@@ -154,6 +126,8 @@ const styles = StyleSheet.create({
         flex: 1,
     },
     bookButton: {
+        flexDirection: "row",
+        gap: 10,
         backgroundColor: '#000',
         marginHorizontal: 20,
         marginBottom: 40,

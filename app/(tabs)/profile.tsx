@@ -10,6 +10,8 @@ import Toast from 'react-native-toast-message';
 import { PencilLine, ChevronLeft, Save, User as UserIcon, CheckCircle, AlertCircle, ImageUp } from 'lucide-react-native';
 import BottomNav from '@/components/BottomNav';
 import { useRouter } from 'expo-router';
+import { useSelector } from 'react-redux';
+import { RootState } from '@/store/store';
 
 const schema = yup.object().shape({
   username: yup.string().required('Username is required'),
@@ -48,7 +50,11 @@ export default function Profile() {
       address: '',
     },
   });
-
+  const { fullname, email, username } = useSelector((state: RootState) => ({
+    username: state.auth.user?.cus_username,
+    fullname: state.auth.user?.cus_fullname,
+    email: state.auth.user?.cus_email,
+  }));
   // Get customer ID from AsyncStorage or Redux state
   useEffect(() => {
     const getCusUid = async () => {
@@ -258,17 +264,15 @@ useEffect(() => {
           <Controller
             control={control}
             name="username"
-            render={({ field: { onChange, value } }) => (
+            render={() => (
               <View style={styles.fieldContainer}>
                 <Text style={styles.fieldLabel}>Username</Text>
                 <View style={styles.fieldValueContainer}>
                   <TextInput
                     style={styles.input}
-                    onChangeText={onChange}
-                    value={value}
-                    placeholder="Username"
+                    value={username}
+                    editable={false} 
                     placeholderTextColor="#999"
-                    editable={isEditing}
                   />
                 </View>
                 {errors.username && <Text style={styles.errorText}>{errors.username.message}</Text>}
@@ -279,17 +283,15 @@ useEffect(() => {
           <Controller
             control={control}
             name="first_name"
-            render={({ field: { onChange, value } }) => (
+            render={() => (
               <View style={styles.fieldContainer}>
                 <Text style={styles.fieldLabel}>First Name</Text>
                 <View style={styles.fieldValueContainer}>
                   <TextInput
                     style={styles.input}
-                    onChangeText={onChange}
-                    value={value}
-                    placeholder="First Name"
+                    value={fullname}
                     placeholderTextColor="#999"
-                    editable={isEditing}
+                    editable={false} 
                   />
                 </View>
                 {errors.first_name && <Text style={styles.errorText}>{errors.first_name.message}</Text>}
@@ -321,19 +323,17 @@ useEffect(() => {
           <Controller
             control={control}
             name="email"
-            render={({ field: { onChange, value } }) => (
+            render={() => (
               <View style={styles.fieldContainer}>
                 <Text style={styles.fieldLabel}>Email Address</Text>
                 <View style={styles.fieldValueContainer}>
                   <TextInput
                     style={styles.input}
-                    onChangeText={onChange}
-                    value={value}
-                    placeholder="Email"
+                    value={email}
                     placeholderTextColor="#999"
                     keyboardType="email-address"
                     autoCapitalize="none"
-                    editable={isEditing}
+                    editable={false} 
                   />
                 </View>
                 {errors.email && <Text style={styles.errorText}>{errors.email.message}</Text>}

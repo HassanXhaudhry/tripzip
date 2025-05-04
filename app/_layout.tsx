@@ -22,7 +22,6 @@ function AuthLayout() {
         <Stack.Screen name="Login" />
       )}
       <Stack.Screen name="Signup" />
-      <Stack.Screen name="(drawer)" />
     </Stack>
   );
 }

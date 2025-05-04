@@ -5,16 +5,16 @@ import { useRouter } from 'expo-router';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '@/store/store';
-import { 
-    setPickupLocation, 
-    setDropLocation, 
-    setDate, 
-    setTime, 
-    setReturnDate, 
-    setReturnTime, 
-    setHasReturn, 
-    setPassengers, 
-    setStops 
+import {
+    setPickupLocation,
+    setDropLocation,
+    setDate,
+    setTime,
+    setReturnDate,
+    setReturnTime,
+    setHasReturn,
+    setPassengers,
+    setStops
 } from '@/store/slices/rideSlice';
 
 type DateTimePickerEventType = {
@@ -26,15 +26,15 @@ type DateTimePickerEventType = {
 
 // Use the same Passenger interface from the Redux store
 interface Passenger {
-  count: number;
-  type?: string;
-  ageRange?: string;
+    count: number;
+    type?: string;
+    ageRange?: string;
 }
 
 export default function Ride() {
     const router = useRouter();
     const dispatch = useDispatch<AppDispatch>();
-    
+
     // Access ride state from redux
     const {
         pickupLocation,
@@ -55,7 +55,7 @@ export default function Ride() {
     const [showReturnTimePicker, setShowReturnTimePicker] = useState<boolean>(false);
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [showPassengerModal, setShowPassengerModal] = useState(false);
-    
+
     // Parse dates from ISO strings
     const currentDate = new Date(rideDate);
     const currentTime = new Date(rideTime);
@@ -183,7 +183,7 @@ export default function Ride() {
             }
             return passenger;
         });
-        
+
         setLocalPassengers(updatedPassengers);
         dispatch(setPassengers(updatedPassengers));
     };
@@ -194,8 +194,7 @@ export default function Ride() {
 
     const bookRide = (): void => {
         if (!validateForm()) return;
-        
-        // All data is already in Redux state, so we can just navigate
+
         router.push('/TaxiType');
     };
 
@@ -204,9 +203,10 @@ export default function Ride() {
             <View style={styles.container}>
                 <View style={styles.header}>
                     <View style={styles.headerText}>
-                        <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
+                        <TouchableOpacity onPress={() => router.push("/(drawer)/Home")} style={styles.backButton}>
                             <ChevronLeft size={24} color="#000" style={styles.chevron} />
                         </TouchableOpacity>
+
                         <Text style={styles.title}>Book Your Ride</Text>
                     </View>
                     <View>

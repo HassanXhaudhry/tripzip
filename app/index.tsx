@@ -1,6 +1,10 @@
 import React, { useRef, useState } from 'react';
 import { Animated, Dimensions, FlatList, FlatListProps, Image, TouchableOpacity, View, Text, NativeSyntheticEvent, NativeScrollEvent, ListRenderItem, StyleSheet, Button } from "react-native";
-import { Link, useRouter } from 'expo-router';
+import { Link, Redirect, useRouter } from 'expo-router';
+import 'react-native-gesture-handler';
+import 'react-native-reanimated';
+import { useSelector } from 'react-redux';
+import { RootState } from '@/store/store';
 
 interface FlightItem {
     id: number;
@@ -21,7 +25,7 @@ const Main: React.FC = () => {
     const scrollX = useRef(new Animated.Value(0)).current;
     const buttonTextOpacity = useRef(new Animated.Value(1)).current;
     const [buttonText, setButtonText] = useState("Next");
-    
+    const { isAuthenticated } = useSelector((state: RootState) => state.auth);
     const mainTextOpacity = useRef(new Animated.Value(1)).current;
     const secondTextOpacity = useRef(new Animated.Value(1)).current;
 
@@ -201,8 +205,12 @@ const Main: React.FC = () => {
     };
 
     const handleSkip = () => {
-        router.push('/(auth)/Login');
-    };
+        if (isAuthenticated) {
+          router.push('/(drawer)/Home');
+        } else {
+          router.push('/(auth)/Login');
+        }
+      };
 
     React.useEffect(() => {
         try {

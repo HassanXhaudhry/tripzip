@@ -2,7 +2,7 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 interface Passenger {
   count: number;
-  type: string;
+  type: any;
 }
 
 interface RideState {

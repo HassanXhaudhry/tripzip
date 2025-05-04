@@ -41,7 +41,7 @@ export default function Login() {
           } 
         }
       });
-      router.push('/(tabs)/Home'); 
+      router.push('/(drawer)/Home'); 
     }
   }, [isAuthenticated, router]);
 

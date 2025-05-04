@@ -119,7 +119,7 @@ export default function SignUp() {
           onShow: () => {
             // Wait a moment before navigating to give the toast time to appear
             setTimeout(() => {
-              router.push('/Login');
+              router.push('/(auth)/Login');
             }, 1500);
           },
           props: { 

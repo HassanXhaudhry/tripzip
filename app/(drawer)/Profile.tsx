@@ -8,7 +8,6 @@ import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import { fetchUserProfile, updateProfile, resetUpdateProfileState } from '../../store/slices/updateProfileSlice';
 import Toast from 'react-native-toast-message';
 import { PencilLine, ChevronLeft, Save, User as UserIcon, CheckCircle, AlertCircle, ImageUp } from 'lucide-react-native';
-import BottomNav from '@/components/BottomNav';
 import { useRouter } from 'expo-router';
 import { useSelector } from 'react-redux';
 import { RootState } from '@/store/store';
@@ -243,9 +242,6 @@ useEffect(() => {
         keyboardShouldPersistTaps="handled"
       >
         <View style={styles.header}>
-        <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
-          <ChevronLeft size={24} color="#000" style={styles.chevron} />
-        </TouchableOpacity>
           <Text style={styles.title}>Your Profile</Text>
           <TouchableOpacity onPress={toggleEditMode} style={styles.editButton}>
             <PencilLine size={20} color="#000" />
@@ -404,8 +400,6 @@ useEffect(() => {
           </TouchableOpacity>
         )}
       </ScrollView>
-
-      <BottomNav />
       <Toast config={{
         success: ({ text1, text2 }) => (
           <View style={[styles.toastContainer, styles.successToast]}>

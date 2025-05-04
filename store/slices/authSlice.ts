@@ -61,7 +61,7 @@ export const loadToken = createAsyncThunk('auth/loadToken', async () => {
 });
 
 export const login = createAsyncThunk(
-  'auth/login',
+  'auth/Login',
   async (
     userData: { Email: string; Password: string },
     { rejectWithValue }
@@ -98,7 +98,7 @@ export const login = createAsyncThunk(
 );
 
 export const signup = createAsyncThunk(
-  'auth/signup',
+  'auth/Signup',
   async (
     userData: { FullName: string; Email: string; PhoneNo: string; Password: string },
     { rejectWithValue }

@@ -1,71 +1,75 @@
-import { View, Text, StyleSheet, TextInput, TouchableOpacity, Platform, ScrollView, BackHandler } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, BackHandler, ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { MaterialIcons } from '@expo/vector-icons';
-import { logout } from '../../store/slices/authSlice'
-import { useState, useEffect, Fragment } from 'react';
-import Feather from '@expo/vector-icons/Feather';
+import { logout } from '../../store/slices/authSlice';
+import { useEffect, Fragment } from 'react';
 import { AppDispatch } from '../../store/store';
-import { useNavigation, useRouter } from 'expo-router';
-import BottomNav from '@/components/BottomNav';
+import { useNavigation } from '@react-navigation/native';
 import { RootState } from '../../store/store';
 import { useDispatch, useSelector } from 'react-redux';
 import { ArrowRight } from 'lucide-react-native';
-
+import { router } from 'expo-router';
 
 export default function Home() {
     const dispatch = useDispatch<AppDispatch>();
-    const router = useRouter();
     const navigation = useNavigation();
-
     const fullname = useSelector((state: RootState) => state.auth.user?.cus_fullname);
 
     useEffect(() => {
-        const backHandler = BackHandler.addEventListener(
-            'hardwareBackPress',
-            () => {
-                // Get current navigation state
-                const state = navigation.getState();
-                const currentRoute = state?.routes[state.index]?.name;
-                // Exit app only if on Home screen
-                if (currentRoute === 'Home') {
+        const backHandler = BackHandler.addEventListener('hardwareBackPress', () => {
+            try {
+                const navState = navigation.getState?.();
+                const currentIndex = navState?.index;
+                const currentRoute = navState?.routes?.[currentIndex ?? 0];
+    
+                if (currentRoute?.name === 'Home') {
                     BackHandler.exitApp();
-                    return true; // Prevent default back behavior
+                    return true;
                 }
-                return false; // Allow default back behavior
+            } catch (error) {
+                console.log('Error checking navigation state:', error);
             }
-        );
+            return false; // Allow default back behavior
+        });
+    
         return () => backHandler.remove();
     }, [navigation]);
+    
 
     const handleLogout = async () => {
         await dispatch(logout());
-        router.replace('../Login');
+        // Using router directly from expo-router
+        router.replace('/(auth)/Login');
+    };
+
+    const navigateToRide = () => {
+        // Using router directly from expo-router
+        router.push('/(tabs)/Ride');
     };
 
     return (
         <Fragment>
-        <View style={styles.container}>
-            <SafeAreaView style={styles.safeArea}>
-                <ScrollView contentContainerStyle={styles.scrollContent}>
-                    <View style={styles.header}>
-                    <Text style={styles.welcomeText}>
-                        TripZip
-                    </Text>
-                        <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
-                            <MaterialIcons name="logout" size={24} color="black" />
-                        </TouchableOpacity>
-                    </View>
+            <View style={styles.container}>
+                <SafeAreaView style={styles.safeArea}>
+                    <ScrollView contentContainerStyle={styles.scrollContent}>
+                        <View style={styles.header}>
+                            <Text style={styles.welcomeText}>
+                                TripZip
+                            </Text>
+                            <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
+                                <MaterialIcons name="logout" size={24} color="black" />
+                            </TouchableOpacity>
+                        </View>
 
-                    <TouchableOpacity
-                        style={styles.bookButton}
-                        onPress={() => router.push('/(tabs)/Ride')}>
-                        <Text style={styles.bookButtonText}>Book Your Ride</Text>
-                        <ArrowRight size={18} color="#FFF" />
-                    </TouchableOpacity>
-                </ScrollView>
-            </SafeAreaView>
-            <BottomNav />
-        </View>
+                        <TouchableOpacity
+                            style={styles.bookButton}
+                            onPress={navigateToRide}>
+                            <Text style={styles.bookButtonText}>Book Your Ride</Text>
+                            <ArrowRight size={18} color="#FFF" />
+                        </TouchableOpacity>
+                    </ScrollView>
+                </SafeAreaView>
+            </View>
         </Fragment>
     );
 }

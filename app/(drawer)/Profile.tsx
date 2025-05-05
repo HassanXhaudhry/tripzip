@@ -54,18 +54,15 @@ export default function Profile() {
     fullname: state.auth.user?.cus_fullname,
     email: state.auth.user?.cus_email,
   }));
-  // Get customer ID from AsyncStorage or Redux state
   useEffect(() => {
     const getCusUid = async () => {
       try {
-        // Try to get cus_uid from AsyncStorage
         const storedCusUid = await AsyncStorage.getItem('cus_uid');
         console.log('cus_uid from AsyncStorage:', storedCusUid);
 
         if (storedCusUid) {
           setLocalCusUid(storedCusUid);
         } else if (user?.cus_uid) {
-          // Fallback to Redux state
           console.log('cus_uid from Redux state:', user.cus_uid);
           setLocalCusUid(user.cus_uid.toString());
         } else {
@@ -83,8 +80,6 @@ export default function Profile() {
 
     getCusUid();
   }, [user]);
-
-  // Fetch user profile data when customer ID is available
   useEffect(() => {
     if (localCusUid) {
       console.log('Fetching user profile with cus_uid:', localCusUid);
@@ -98,28 +93,20 @@ export default function Profile() {
     }
   }, [dispatch, localCusUid]);
 
-  // Update form values when user data is available
-// Update form values when user data is available
-useEffect(() => {
-  if (user) {
-    console.log('User data received:', user);
-    
-    // Map all possible field names to form fields
-    setValue('username', user.username || '');
-    setValue('first_name', user.first_name || user.FirstName || '');
-    setValue('last_name', user.last_name || user.LastName || '');
-    setValue('email', user.email || user.Email || '');
-    setValue('phone', user.phone || user.PhoneNo || '');
-    setValue('address', user.address || user.Address || '');
-    
-    // Set profile image if available
-    // if (user.profile_image || user.ProfileImage) {
-    //   setProfileImage(user.profile_image || user.ProfileImage);
-    // }
-  }
-}, [user, setValue]);
+  useEffect(() => {
+    if (user) {
+      console.log('User data received:', user);
 
-  // Show success toast when profile is updated
+      setValue('username', user.username || '');
+      setValue('first_name', user.first_name || user.FirstName || '');
+      setValue('last_name', user.last_name || user.LastName || '');
+      setValue('email', user.email || user.Email || '');
+      setValue('phone', user.phone || user.PhoneNo || '');
+      setValue('address', user.address || user.Address || '');
+
+    }
+  }, [user, setValue]);
+
   useEffect(() => {
     if (success) {
       Toast.show({
@@ -135,26 +122,23 @@ useEffect(() => {
     }
   }, [success, dispatch]);
 
-  // Show error toast when update fails
-// In your component
-useEffect(() => {
-  if (error) {
-    const errorMessage = typeof error === 'object' 
-      ? JSON.stringify(error) 
-      : error || 'Please try again later';
-      
-    Toast.show({
-      type: 'error',
-      text1: 'Update Failed',
-      text2: errorMessage.substring(0, 100), // Limit length to avoid overflow
-      position: 'top',
-      visibilityTime: 4000,
-      topOffset: 40,
-    });
-  }
-}, [error]);
+  useEffect(() => {
+    if (error) {
+      const errorMessage = typeof error === 'object'
+        ? JSON.stringify(error)
+        : error || 'Please try again later';
 
-  // Show fetch error toast
+      Toast.show({
+        type: 'error',
+        text1: 'Update Failed',
+        text2: errorMessage.substring(0, 100), 
+        position: 'top',
+        visibilityTime: 4000,
+        topOffset: 40,
+      });
+    }
+  }, [error]);
+
   useEffect(() => {
     if (fetchError) {
       Toast.show({
@@ -197,23 +181,17 @@ useEffect(() => {
     setIsEditing(!isEditing);
   };
 
-
-  // Simulating image selection functionality
   const selectImage = () => {
-    // In a real implementation, this would use image picker
     console.log('Select image clicked');
-    // Placeholder for image picker functionality
-    // Would need to use something like react-native-image-picker
   };
 
-  // Render avatar or placeholder
   const renderAvatar = () => {
     if (profileImage) {
       return (
-        <Image 
-          source={{ uri: profileImage }} 
-          style={styles.avatar} 
-          resizeMode="cover" 
+        <Image
+          source={{ uri: profileImage }}
+          style={styles.avatar}
+          resizeMode="cover"
         />
       );
     } else {
@@ -236,7 +214,7 @@ useEffect(() => {
 
   return (
     <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={styles.container}>
-      <ScrollView 
+      <ScrollView
         contentContainerStyle={styles.scrollContentContainer}
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
@@ -244,9 +222,19 @@ useEffect(() => {
         <View style={styles.header}>
           <Text style={styles.title}>Your Profile</Text>
           <TouchableOpacity onPress={toggleEditMode} style={styles.editButton}>
-            <PencilLine size={20} color="#000" />
-            <Text style={styles.editButtonText}>{isEditing ? 'Cancel' : 'Edit'}</Text>
+            {!isEditing && (
+              <PencilLine size={20} color="#000" style={{ marginRight: 8 }} />
+            )}
+            <Text
+              style={[
+                styles.editButtonText,
+                !isEditing && { marginLeft: 0 },
+              ]}
+            >
+              {isEditing ? 'Cancel' : 'Edit'}
+            </Text>
           </TouchableOpacity>
+
         </View>
 
         <View style={styles.avatarContainer}>
@@ -265,9 +253,9 @@ useEffect(() => {
                 <Text style={styles.fieldLabel}>Username</Text>
                 <View style={styles.fieldValueContainer}>
                   <TextInput
-                    style={styles.input}
+                    style={[styles.input, styles.disabledInput]}
                     value={username}
-                    editable={false} 
+                    editable={false}
                     placeholderTextColor="#999"
                   />
                 </View>
@@ -284,10 +272,10 @@ useEffect(() => {
                 <Text style={styles.fieldLabel}>First Name</Text>
                 <View style={styles.fieldValueContainer}>
                   <TextInput
-                    style={styles.input}
+                    style={[styles.input, styles.disabledInput]}
                     value={fullname}
                     placeholderTextColor="#999"
-                    editable={false} 
+                    editable={false}
                   />
                 </View>
                 {errors.first_name && <Text style={styles.errorText}>{errors.first_name.message}</Text>}
@@ -324,12 +312,12 @@ useEffect(() => {
                 <Text style={styles.fieldLabel}>Email Address</Text>
                 <View style={styles.fieldValueContainer}>
                   <TextInput
-                    style={styles.input}
+                    style={[styles.input, styles.disabledInput]}
                     value={email}
                     placeholderTextColor="#999"
                     keyboardType="email-address"
                     autoCapitalize="none"
-                    editable={false} 
+                    editable={false}
                   />
                 </View>
                 {errors.email && <Text style={styles.errorText}>{errors.email.message}</Text>}
@@ -472,7 +460,6 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
   editButtonText: {
-    marginLeft: 8,
     color: '#000',
     fontWeight: 'bold',
   },
@@ -528,6 +515,9 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#000',
   },
+  disabledInput: {
+    color: '#666',
+  },
   errorText: {
     color: '#FF5252',
     fontSize: 12,
@@ -541,7 +531,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: '#000',
-    height: 56,
+    height: 50,
     borderRadius: 28,
   },
   saveButtonDisabled: {

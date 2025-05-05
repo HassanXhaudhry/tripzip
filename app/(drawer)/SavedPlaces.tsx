@@ -1,14 +1,16 @@
 import { View, Text, TouchableOpacity, StyleSheet, SafeAreaView } from 'react-native'
 import React from 'react'
 import { useRouter } from 'expo-router'
-import { ChevronLeft } from 'lucide-react-native';
 
-const Chat = () => {
+const SavedPlaces = () => {
   const router = useRouter();
   return (
     <View style={styles.container}>
       <SafeAreaView style={styles.content}>
-        <Text style={styles.placeholder}>Chat Content</Text>
+        <TouchableOpacity
+          style={styles.addButton}>
+          <Text style={styles.addButtonText}>Add</Text>
+        </TouchableOpacity>
       </SafeAreaView>
     </View>
   )
@@ -18,11 +20,11 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#FFB300',
-    position: 'relative', // Important: provides positioning context for absolute elements
+    position: 'relative',
   },
   content: {
     flex: 1,
-    paddingBottom: 90, // Add space at the bottom to prevent content from being covered by nav
+    paddingBottom: 30,
   },
   backButton: {
     margin: 15,
@@ -33,7 +35,23 @@ const styles = StyleSheet.create({
   placeholder: {
     textAlign: 'center',
     marginTop: 20,
-  }
+  },
+  addButton: {
+    flexDirection: "row",
+    gap: 10,
+    backgroundColor: '#000',
+    marginHorizontal: 20,
+    marginVertical: 40,
+    height: 50,
+    borderRadius: 28,
+    justifyContent: 'center',
+    alignItems: 'center',
+},
+addButtonText: {
+    color: '#FFF',
+    fontSize: 18,
+    fontWeight: '600',
+}
 });
 
-export default Chat
+export default SavedPlaces

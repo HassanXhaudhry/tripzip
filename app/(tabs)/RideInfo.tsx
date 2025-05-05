@@ -266,16 +266,13 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFB300',
   },
   scrollContent: {
-    padding: 16,
-    paddingBottom: 40,
+    padding: 20,
   },
   loadingContainer: {
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 20,
   },
   loadingText: {
-    marginTop: 10,
     fontSize: 16,
     color: '#000',
   },
@@ -304,13 +301,13 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 16,
+    paddingBottom: 20
   },
   backButton: {
     marginRight: 15,
   },
   title: {
-    fontSize: 20,
+    fontSize: 22,
     fontWeight: 'bold',
     color: '#000',
   },

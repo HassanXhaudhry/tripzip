@@ -2,8 +2,9 @@ import { configureStore } from '@reduxjs/toolkit';
 import authReducer from './slices/authSlice';
 import updateProfileReducer from './slices/updateProfileSlice';
 import taxiTypeReducer from './slices/taxiTypeSlice';
-import rideReducer from './slices/rideSlice'
+import rideReducer from './slices/rideSlice';
 import customerInfoReducer from './slices/customerInfoSlice';
+import bookingReducer from './slices/myBookingSlice';
 
 export const store = configureStore({
   reducer: {
@@ -12,10 +13,11 @@ export const store = configureStore({
     taxiType: taxiTypeReducer,
     ride: rideReducer,
     customerInfo: customerInfoReducer,
+    booking: bookingReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
-      serializableCheck: false, // This allows non-serializable values in your state
+      serializableCheck: false,
     }),
 });
 

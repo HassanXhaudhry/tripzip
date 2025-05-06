@@ -15,6 +15,7 @@ interface RideState {
   hasReturn: boolean;
   passengers: Passenger[];
   stops: string[];
+  distance: string | null
 }
 
 const initialState: RideState = {
@@ -27,6 +28,7 @@ const initialState: RideState = {
   hasReturn: false,
   passengers: [],
   stops: [],
+  distance: null
 };
 
 const rideSlice = createSlice({

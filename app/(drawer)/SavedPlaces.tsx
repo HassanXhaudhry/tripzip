@@ -7,6 +7,9 @@ const SavedPlaces = () => {
   return (
     <View style={styles.container}>
       <SafeAreaView style={styles.content}>
+        <View style={styles.header}>
+          <Text style={styles.headerTitle}>Saved Places</Text>
+        </View>
         <TouchableOpacity
           style={styles.addButton}>
           <Text style={styles.addButtonText}>Add</Text>
@@ -26,11 +29,17 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingBottom: 30,
   },
-  backButton: {
-    margin: 15,
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 15,
+    paddingTop: 10,
+    paddingBottom: 10,
   },
-  chevron: {
-    marginTop: 3
+  headerTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
   },
   placeholder: {
     textAlign: 'center',
@@ -46,12 +55,12 @@ const styles = StyleSheet.create({
     borderRadius: 28,
     justifyContent: 'center',
     alignItems: 'center',
-},
-addButtonText: {
+  },
+  addButtonText: {
     color: '#FFF',
     fontSize: 18,
     fontWeight: '600',
-}
+  }
 });
 
 export default SavedPlaces
